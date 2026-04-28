@@ -1,6 +1,6 @@
-using XmlOrderReader.Web.Models.Enums;
+using KG.MES.Main.Models.Enums;
 
-namespace XmlOrderReader.Web.Interfaces
+namespace KG.MES.Main.Interfaces
 {
 	public interface IXmlDataMaterial
 	{

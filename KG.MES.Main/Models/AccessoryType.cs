@@ -1,6 +1,6 @@
 using System.ComponentModel;
 
-namespace XmlOrderReader.Web.Models
+namespace KG.MES.Main.Models
 {
 	public enum AccessoryType
 	{

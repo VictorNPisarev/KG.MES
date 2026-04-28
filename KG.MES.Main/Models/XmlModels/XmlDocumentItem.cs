@@ -1,10 +1,10 @@
 using System.Reflection.Metadata.Ecma335;
 using System.Xml.Serialization;
-using XmlOrderReader.Web.Interfaces;
-using XmlOrderReader.Web.Models.Enums;
-using XmlOrderReader.Web.Services;
+using KG.MES.Main.Interfaces;
+using KG.MES.Main.Models.Enums;
+using KG.MES.Main.Services;
 
-namespace XmlOrderReader.Web.Models.Xml
+namespace KG.MES.Main.Models.Xml
 {
 	/// <summary>
 	/// Модель XML файла

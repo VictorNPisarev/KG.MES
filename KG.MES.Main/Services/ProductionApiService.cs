@@ -1,13 +1,15 @@
 using System.Text;
 using System.Text.Json;
-using XmlOrderReader.Web.Models;
-using XmlOrderReader.Web.Models.Dto;
+using KG.MES.Main.Models;
+using KG.MES.Shared.Models.Dto;
 
-public class ProductionApiService
+namespace KG.MES.Main.Services
 {
-	private readonly HttpClient _httpClient;
-	private readonly ILogger<ProductionApiService> _logger;
-	private readonly IConfiguration _configuration;
+	public class ProductionApiService
+	{
+		private readonly HttpClient _httpClient;
+		private readonly ILogger<ProductionApiService> _logger;
+		private readonly IConfiguration _configuration;
 
 	public ProductionApiService(
 		HttpClient httpClient,
@@ -148,17 +150,18 @@ public class ProductionApiService
 		}
 	}
 
-	public async Task<bool> TestConnectionAsync()
-	{
-		try
+		public async Task<bool> TestConnectionAsync()
 		{
-			using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(10));
-			var response = await _httpClient.GetAsync($"{BaseUrl}/health", cts.Token);
-			return response.IsSuccessStatusCode;
-		}
-		catch
-		{
-			return false;
+			try
+			{
+				using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(10));
+				var response = await _httpClient.GetAsync($"{BaseUrl}/health", cts.Token);
+				return response.IsSuccessStatusCode;
+			}
+			catch
+			{
+				return false;
+			}
 		}
 	}
 }

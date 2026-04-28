@@ -1,7 +1,7 @@
 using System.ComponentModel;
-using XmlOrderReader.Web.Common.Attributes;
+using KG.MES.Main.Common.Attributes;
 
-namespace XmlOrderReader.Web.Models.Enums
+namespace KG.MES.Main.Models.Enums
 {
 	public enum DocumentItemType
 	{

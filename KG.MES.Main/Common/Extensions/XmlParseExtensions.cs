@@ -1,4 +1,4 @@
-namespace XmlOrderReader.Web.Common.Extensions
+namespace KG.MES.Main.Common.Extensions
 {
 	public static class XmlParseExtensions
 	{

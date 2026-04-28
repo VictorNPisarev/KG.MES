@@ -1,15 +1,15 @@
 using System.Xml.Serialization;
 using System.Linq;
-using XmlOrderReader.Web.Interfaces;
-using XmlOrderReader.Web.Models.Xml;
+using KG.MES.Main.Interfaces;
+using KG.MES.Main.Models.Xml;
 using System.Text.RegularExpressions;
-using XmlOrderReader.Web.Services;
-using XmlOrderReader.Web.Models.Enums;
+using KG.MES.Main.Services;
+using KG.MES.Main.Models.Enums;
 using System.Runtime.CompilerServices;
 using System.Collections;
 using System.Text.Json.Serialization;
 
-namespace XmlOrderReader.Web.Models
+namespace KG.MES.Main.Models
 {
 	/// <summary>
 	/// Модель позиции заказа

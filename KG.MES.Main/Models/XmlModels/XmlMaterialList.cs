@@ -1,7 +1,7 @@
 using System.Xml.Serialization;
-using XmlOrderReader.Web.Interfaces;
+using KG.MES.Main.Interfaces;
 
-namespace XmlOrderReader.Web.Models.Xml
+namespace KG.MES.Main.Models.Xml
 {
 	public partial class XmlMaterialList
 	{

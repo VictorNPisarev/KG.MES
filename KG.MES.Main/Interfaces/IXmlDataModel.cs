@@ -1,4 +1,4 @@
-namespace XmlOrderReader.Web.Interfaces
+namespace KG.MES.Main.Interfaces
 {
 	public interface IXmlDataModel
 	{

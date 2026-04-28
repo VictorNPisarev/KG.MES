@@ -1,6 +1,6 @@
-using XmlOrderReader.Web.Models.Enums;
+using KG.MES.Main.Models.Enums;
 
-namespace XmlOrderReader.Web.Models
+namespace KG.MES.Main.Models
 {
 	/// <summary>
 	/// Базовый интерфейс для всех материалов, чтобы можно было работать с ними единообразно

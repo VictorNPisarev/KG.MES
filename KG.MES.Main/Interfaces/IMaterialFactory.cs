@@ -1,6 +1,6 @@
-using XmlOrderReader.Web.Models;
+using KG.MES.Main.Models;
 
-namespace XmlOrderReader.Web.Interfaces
+namespace KG.MES.Main.Interfaces
 {
 	public interface IMaterialFactory
 	{

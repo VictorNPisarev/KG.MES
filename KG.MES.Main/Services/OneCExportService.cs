@@ -1,10 +1,10 @@
 using System.Text;
 using System.Text.Json;
-using XmlOrderReader.Web.Interfaces;
-using XmlOrderReader.Web.Models;
-using XmlOrderReader.Web.Models.Xml;
+using KG.MES.Main.Interfaces;
+using KG.MES.Main.Models;
+using KG.MES.Main.Models.Xml;
 
-namespace XmlOrderReader.Web.Services
+namespace KG.MES.Main.Services
 {
 	public class OneCExportService : I1CExportService
 	{

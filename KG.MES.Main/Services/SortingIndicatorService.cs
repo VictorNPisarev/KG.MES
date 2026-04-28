@@ -1,9 +1,9 @@
 // Services/SortingIndicatorService.cs
 using System.Text.Json;
-using XmlOrderReader.Web.Models;
-using XmlOrderReader.Web.Models.Enums;
+using KG.MES.Main.Models;
+using KG.MES.Main.Models.Enums;
 
-namespace XmlOrderReader.Web.Services
+namespace KG.MES.Main.Services
 {
 	public class SortingIndicatorService
 	{

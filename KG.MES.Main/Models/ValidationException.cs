@@ -1,4 +1,4 @@
-namespace XmlOrderReader.Web.Models
+namespace KG.MES.Main.Models
 {
     public class ValidateException : Exception
     {
