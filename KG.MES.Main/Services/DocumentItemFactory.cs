@@ -1,10 +1,10 @@
-using XmlOrderReader.Web.Interfaces;
-using XmlOrderReader.Web.Models;
-using XmlOrderReader.Web.Models.Enums;
-using XmlOrderReader.Web.Models.Xml;
-using XmlOrderReader.Web.Services;
+using KG.MES.Main.Interfaces;
+using KG.MES.Main.Models;
+using KG.MES.Main.Models.Enums;
+using KG.MES.Main.Models.Xml;
+using KG.MES.Main.Services;
 
-namespace XmlOrderReader.Web.Services
+namespace KG.MES.Main.Services
 {
 	public class DocumentItemFactory : IDocumentItemFactory
 	{

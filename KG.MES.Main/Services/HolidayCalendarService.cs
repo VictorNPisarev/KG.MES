@@ -1,4 +1,4 @@
-namespace XmlOrderReader.Web.Services
+namespace KG.MES.Main.Services
 {
 	public class HolidayCalendarService
 	{

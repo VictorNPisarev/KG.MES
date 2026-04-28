@@ -1,6 +1,6 @@
 using System.ComponentModel;
 
-namespace XmlOrderReader.Web.Models.Enums
+namespace KG.MES.Main.Models.Enums
 {
     /// <summary>
     /// Типы XML-блоков, которые содержат материалы

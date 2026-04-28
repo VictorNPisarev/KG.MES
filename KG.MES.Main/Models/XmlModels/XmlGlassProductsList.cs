@@ -1,6 +1,6 @@
 using System.Xml.Serialization;
 
-namespace XmlOrderReader.Web.Models.Xml
+namespace KG.MES.Main.Models.Xml
 {
 	public partial class XmlGlassProductsList
 	{

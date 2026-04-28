@@ -1,7 +1,7 @@
 // Models/SortingIndicator.cs
 using System.Text.Json.Serialization;
 
-namespace XmlOrderReader.Web.Models
+namespace KG.MES.Main.Models
 {
 	public class SortingIndicator
 	{

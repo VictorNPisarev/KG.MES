@@ -1,4 +1,4 @@
-namespace XmlOrderReader.Web.Common.Extensions
+namespace KG.MES.Main.Common.Extensions
 {
 	/// <summary>
 	/// Расширение для словаря, чтобы при добавлении проверять на null и пустые значения, и не добавлять соответствующие элементы

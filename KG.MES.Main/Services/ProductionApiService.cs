@@ -1,9 +1,9 @@
 using System.Text;
 using System.Text.Json;
-using XmlOrderReader.Web.Models;
+using KG.MES.Main.Models;
 using KG.MES.Shared.Models.Dto;
 
-namespace XmlOrderReader.Web.Services
+namespace KG.MES.Main.Services
 {
 	public class ProductionApiService
 	{

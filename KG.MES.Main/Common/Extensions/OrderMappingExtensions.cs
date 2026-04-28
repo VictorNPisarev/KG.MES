@@ -1,9 +1,9 @@
-using XmlOrderReader.Web.Models;
+using KG.MES.Main.Models;
 using KG.MES.Shared.Models.Dto;
-using XmlOrderReader.Web.Models.Enums;
-using XmlOrderReader.Web.Services;
+using KG.MES.Main.Models.Enums;
+using KG.MES.Main.Services;
 
-namespace XmlOrderReader.Web.Extensions
+namespace KG.MES.Main.Extensions
 {
 	public static class OrderMappingExtensions
 	{

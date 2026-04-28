@@ -1,7 +1,7 @@
 using System.Xml.Serialization;
-using XmlOrderReader.Web.Models.Xml;
+using KG.MES.Main.Models.Xml;
 
-namespace XmlOrderReader.Web.Models
+namespace KG.MES.Main.Models
 { 
 	public class Paint
 	{

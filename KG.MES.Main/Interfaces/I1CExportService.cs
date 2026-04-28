@@ -1,7 +1,7 @@
-using XmlOrderReader.Web.Models;
-using XmlOrderReader.Web.Models.Xml;
+using KG.MES.Main.Models;
+using KG.MES.Main.Models.Xml;
 
-namespace XmlOrderReader.Web.Interfaces
+namespace KG.MES.Main.Interfaces
 {
     public interface I1CExportService
     {
