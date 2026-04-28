@@ -1,5 +1,5 @@
 using XmlOrderReader.Web.Models;
-using XmlOrderReader.Web.Models.Dto;
+using KG.MES.Shared.Models.Dto;
 using XmlOrderReader.Web.Models.Enums;
 using XmlOrderReader.Web.Services;
 
