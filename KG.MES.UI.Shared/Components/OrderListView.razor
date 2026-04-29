@@ -17,9 +17,12 @@
 						<i class="bi bi-clipboard-check"></i>  @Title
 					</h1>
 				</div>
-				<div class="col-auto">
-					@HeaderActions
-				</div>
+				@if(ShowActions)
+				{
+					<div class="col-auto">
+						@HeaderActions
+					</div>
+				}
 			</div>
 		</div>
 	</div>
