@@ -2,13 +2,13 @@
 using System.Runtime.CompilerServices;
 using System.Text.Json.Serialization;
 using System.Xml.Serialization;
-using XmlOrderReader.Web.Common.Extensions;
-using XmlOrderReader.Web.Interfaces;
-using XmlOrderReader.Web.Models.Enums;
-using XmlOrderReader.Web.Models.Xml;
-using XmlOrderReader.Web.Services;
+using KG.MES.Main.Common.Extensions;
+using KG.MES.Main.Interfaces;
+using KG.MES.Main.Models.Enums;
+using KG.MES.Main.Models.Xml;
+using KG.MES.Main.Services;
 
-namespace XmlOrderReader.Web.Models
+namespace KG.MES.Main.Models
 {
 	/// <summary>
 	/// Универсальный класс для любого материала в заказе

@@ -1,12 +1,12 @@
 using System.Xml.Serialization;
 using System.ComponentModel.DataAnnotations;
-using XmlOrderReader.Web.Models.Xml;
-using XmlOrderReader.Web.Common.Extensions;
-using XmlOrderReader.Web.Models.Enums;
-using XmlOrderReader.Web.Services;
-using XmlOrderReader.Web.Interfaces;
+using KG.MES.Main.Models.Xml;
+using KG.MES.Main.Common.Extensions;
+using KG.MES.Main.Models.Enums;
+using KG.MES.Main.Services;
+using KG.MES.Main.Interfaces;
 
-namespace XmlOrderReader.Web.Models
+namespace KG.MES.Main.Models
 {
 	public partial class DocumentData
 	{

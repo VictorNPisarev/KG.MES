@@ -1,8 +1,8 @@
 using System.ComponentModel;
 using System.Reflection;
-using XmlOrderReader.Web.Common.Attributes;
+using KG.MES.Shared.Common.Attributes;
 
-namespace XmlOrderReader.Web.Common.Extensions
+namespace KG.MES.Shared.Common.Extensions
 {
 	public static class EnumExtensions
 	{

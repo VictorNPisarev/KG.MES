@@ -1,5 +1,5 @@
 // Common/Attributes/ColorAttribute.cs
-namespace XmlOrderReader.Web.Common.Attributes
+namespace KG.MES.Shared.Common.Attributes
 {
 	[AttributeUsage(AttributeTargets.Field)]
 	public class ColorAttribute : Attribute

@@ -1,8 +1,8 @@
 // Enums/IndicatorCategoryType.cs
 using System.ComponentModel;
-using XmlOrderReader.Web.Common.Attributes;
+using KG.MES.Shared.Common.Attributes;
 
-namespace XmlOrderReader.Web.Models.Enums
+namespace KG.MES.Main.Models.Enums
 {
 	public enum IndicatorCategoryType
 	{

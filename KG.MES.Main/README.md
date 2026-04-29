@@ -19,7 +19,7 @@
 - System.Xml.Serialization
 
 ## Структура проекта
-XmlOrderReader.Web/
+KG.MES.Main/
 ├── Models/ # Модели данных
 ├── Interfaces/ # Интерфейсы сервисов
 ├── Services/ # Реализации сервисов

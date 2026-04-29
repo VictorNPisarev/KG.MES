@@ -1,9 +1,10 @@
 using System.Xml.Serialization;
-using XmlOrderReader.Web.Common.Extensions;
-using XmlOrderReader.Web.Interfaces;
-using XmlOrderReader.Web.Models.Enums;
+using KG.MES.Main.Common.Extensions;
+using KG.MES.Main.Interfaces;
+using KG.MES.Main.Models.Enums;
+using KG.MES.Shared.Common.Extensions;
 
-namespace XmlOrderReader.Web.Models.Xml
+namespace KG.MES.Main.Models.Xml
 {
 	public partial class XmlGlassProduct
 	{

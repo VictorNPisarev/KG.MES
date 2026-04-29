@@ -1,13 +1,16 @@
 @page "/upload"
-@using XmlOrderReader.Web.Extensions
-@using XmlOrderReader.Web.Models
-@using XmlOrderReader.Web.Interfaces
+@using KG.MES.Main.Extensions
+@using KG.MES.Main.Models
+@using KG.MES.Main.Interfaces
 @using Microsoft.AspNetCore.Components.Web
 @using Microsoft.AspNetCore.Components.Forms
 @using Microsoft.JSInterop
-@using XmlOrderReader.Web.Components
-@using XmlOrderReader.Web.Models.Enums
-@using XmlOrderReader.Web.Services
+@using KG.MES.Main.Components
+@using KG.MES.Main.Models.Enums
+@using KG.MES.Main.Services
+@using KG.MES.Shared.Services
+@inject ProductionApiService ApiService
+
 @inject IXmlReaderService XmlReaderService
 @inject I1CExportService ExportService
 @inject SortingIndicatorService SortingService
@@ -227,9 +230,6 @@
 	private int TotalItems => Orders.Sum(o => o.DocumentItems?.Count ?? 0);
 	private decimal AverageOrderAmount => HasOrders ? TotalAmount / Orders.Count : 0;
 
-	[Inject] private ProductionApiService ProductionService { get; set; } = null!;
-
-
 	private async Task TriggerFileInput()
 	{
 		await JSRuntime.InvokeVoidAsync("fileUtils.triggerFileInput", "fileInputHidden");
@@ -302,7 +302,7 @@
 			// Расчёт даты готовности
 			editOrder.ReadyDate = HolidayService.AddBusinessDays(SelectedOrder.InitializeDate, SelectedOrder.ApprovedLeadTimeDays);
 
-			var success = await ProductionService.ExportToProductionAsync(SelectedOrder, editOrder);
+			var success = await ApiService.ExportToProductionAsync(editOrder);
 
 			if (success)
 			{

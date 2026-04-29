@@ -1,10 +1,10 @@
 using System.Xml.Serialization;
 using System.Collections.Generic;
-using XmlOrderReader.Web.Interfaces;
-using XmlOrderReader.Web.Models.Xml;
+using KG.MES.Main.Interfaces;
+using KG.MES.Main.Models.Xml;
 using System.Text.Json.Serialization;
 
-namespace XmlOrderReader.Web.Models
+namespace KG.MES.Main.Models
 {
 	/// <summary>
 	/// Модель списка материалов

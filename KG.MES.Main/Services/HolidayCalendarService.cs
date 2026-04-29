@@ -1,4 +1,4 @@
-namespace XmlOrderReader.Web.Services
+namespace KG.MES.Main.Services
 {
 	public class HolidayCalendarService
 	{
@@ -35,11 +35,11 @@ namespace XmlOrderReader.Web.Services
 				_holidays.Add(holiday);
 		}
 
-		public async Task LoadFromGoogleCalendarAsync(string calendarId, string apiKey)
+		/*public async Task LoadFromGoogleCalendarAsync(string calendarId, string apiKey)
 		{
 			// TODO: загрузка праздников из Google Calendar API
 			// https://www.googleapis.com/calendar/v3/calendars/{calendarId}/events?key={apiKey}
-		}
+		}*/
 
 		public DateTime AddBusinessDays(DateTime startDate, int days)
 		{

@@ -1,7 +1,10 @@
 @page "/"
 @using Microsoft.AspNetCore.Components.Web
-@using XmlOrderReader.Web.Models.Dto
-@inject ProductionApiService ProductionService
+@using KG.MES.Shared.Models.Dto
+@using KG.MES.Main.Services
+@using KG.MES.Shared.Services
+@inject ProductionApiService ApiService
+
 
 <PageTitle>Заказы в производстве</PageTitle>
 
@@ -32,12 +35,12 @@
 	<!-- Фильтры -->
 	<div class="row mt-4 g-2">
 		<div class="col-md-2">
-			<select class="form-select" @bind="filterStatus">
-				<option value="">Все заказы</option>
-				<option value="none">Новые</option>
-				<option value="pending,active">В работе</option>
-				<option value="готово">Готово</option>
-				<option value="отгружен">Отгружено</option>
+			<select class="form-select" @bind="selectedWorkplaceId">
+				<option value="">Все участки</option>
+				@foreach (var workplace in workplaces)
+				{
+					<option value="@workplace.Id">@workplace.Name</option>
+				}
 			</select>
 		</div>
 		<div class="col-md-2">
@@ -179,11 +182,14 @@
 	private string searchNumber = "";
 	private int currentPage = 1;
 	private int pageSize = 50;
-    private string sortBy = "ready_date";
-    private string sortOrder = "asc";
+	private string sortBy = "ready_date";
+	private string sortOrder = "asc";
+	private List<WorkplaceDto> workplaces = new();
+	private Guid? selectedWorkplaceId;
 
 	protected override async Task OnInitializedAsync()
 	{
+		workplaces = await ApiService.GetActiveWorkplacesAsync();
 		await LoadOrders();
 	}
 
@@ -194,9 +200,9 @@
 
 		try
 		{
-			orders = await ProductionService.GetOrdersAsync(
-				status: null,//string.IsNullOrEmpty(filterStatus) ? null : filterStatus,
-				number: null,//string.IsNullOrEmpty(searchNumber) ? null : searchNumber,
+			orders = await ApiService.GetOrdersAsync(
+				workplaceId: selectedWorkplaceId,
+				orderNumber: string.IsNullOrEmpty(searchNumber) ? null : searchNumber,
 				page: currentPage,
 				limit: pageSize,
 				sortBy: sortBy,
