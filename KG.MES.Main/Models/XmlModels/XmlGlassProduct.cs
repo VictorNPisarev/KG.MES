@@ -2,6 +2,7 @@ using System.Xml.Serialization;
 using KG.MES.Main.Common.Extensions;
 using KG.MES.Main.Interfaces;
 using KG.MES.Main.Models.Enums;
+using KG.MES.Shared.Common.Extensions;
 
 namespace KG.MES.Main.Models.Xml
 {

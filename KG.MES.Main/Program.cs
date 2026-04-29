@@ -2,6 +2,7 @@ using KG.MES.Main.Interfaces;
 using KG.MES.Main.Models;
 using KG.MES.Main.Models.Xml;
 using KG.MES.Main.Services;
+using KG.MES.Shared.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 

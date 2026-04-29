@@ -1,8 +1,8 @@
 using System.ComponentModel;
 using System.Reflection;
-using KG.MES.Main.Common.Attributes;
+using KG.MES.Shared.Common.Attributes;
 
-namespace KG.MES.Main.Common.Extensions
+namespace KG.MES.Shared.Common.Extensions
 {
 	public static class EnumExtensions
 	{

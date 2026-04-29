@@ -1,4 +1,4 @@
-namespace KG.MES.Main.Common.Extensions
+namespace KG.MES.Shared.Common.Extensions
 {
 	/// <summary>
 	/// Расширение для словаря, чтобы при добавлении проверять на null и пустые значения, и не добавлять соответствующие элементы

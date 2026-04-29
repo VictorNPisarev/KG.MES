@@ -1,5 +1,5 @@
 using System.ComponentModel;
-using KG.MES.Main.Common.Attributes;
+using KG.MES.Shared.Common.Attributes;
 
 namespace KG.MES.Main.Models.Enums
 {

@@ -1,5 +1,5 @@
 using System.Xml.Serialization;
-using KG.MES.Main.Common.Extensions;
+using KG.MES.Shared.Common.Extensions;
 using KG.MES.Main.Interfaces;
 using KG.MES.Main.Models.Enums;
 

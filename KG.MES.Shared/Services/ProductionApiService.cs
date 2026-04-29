@@ -1,9 +1,12 @@
+using System.Net.Http.Json;
 using System.Text;
 using System.Text.Json;
-using KG.MES.Main.Models;
+using KG.MES.Shared.Models;
 using KG.MES.Shared.Models.Dto;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 
-namespace KG.MES.Main.Services
+namespace KG.MES.Shared.Services
 {
 	public class ProductionApiService
 	{
@@ -33,7 +36,7 @@ namespace KG.MES.Main.Services
 		/// <param name="order"></param>
 		/// <param name="dto"></param>
 		/// <returns></returns>
-		public async Task<bool> ExportToProductionAsync(DocumentData order, ProductionOrderExportDto dto)
+		public async Task<bool> ExportToProductionAsync(ProductionOrderExportDto dto)
 		{
 			var retries = 0;
 
@@ -54,7 +57,7 @@ namespace KG.MES.Main.Services
 
 					if (response.IsSuccessStatusCode)
 					{
-						_logger.LogInformation("Order {OrderNumber} sent to production successfully", order.DocumentNumber);
+						_logger.LogInformation("Order {OrderNumber} sent to production successfully", dto.OrderNumber);
 						return true;
 					}
 
@@ -81,7 +84,7 @@ namespace KG.MES.Main.Services
 			}
 
 			_logger.LogError("Failed to send order {OrderNumber} to production after {RetryCount} attempts",
-				order.DocumentNumber, RetryCount);
+				dto.OrderNumber, RetryCount);
 
 			return false;
 		}
@@ -120,9 +123,10 @@ namespace KG.MES.Main.Services
 				}
 
 				// Список с пагинацией и сортировкой
-				var endpoint = !string.IsNullOrEmpty(status)
-					? $"orders/{Uri.EscapeDataString(status)}"
-					: "orders/all";
+				/*var endpoint = status != null
+					? $"orders/{Uri.EscapeDataString(status.ToString() ?? string.Empty)}"
+					: "orders/all";*/
+				var endpoint = "orders/all";
 
 				var queryParams = new List<string>
 			{
@@ -160,6 +164,145 @@ namespace KG.MES.Main.Services
 			}
 			catch
 			{
+				return false;
+			}
+		}
+
+		public async Task<PaginatedResponse<ProductionOrderDto>> GetOrdersAsync(
+			Guid? workplaceId = null,
+			string? orderNumber = null,
+			int page = 1,
+			int limit = 50,
+			string? sortBy = null,
+			string? sortOrder = null)
+		{
+			try
+			{
+				var queryParams = new Dictionary<string, string>
+				{
+					["page"] = page.ToString(),
+					["limit"] = limit.ToString()
+				};
+
+				var endpoint = "orders/all";
+
+				if (workplaceId.HasValue && workplaceId != Guid.Empty)
+				{
+					endpoint = "orders";
+					queryParams["workplaceId"] = workplaceId.Value.ToString();
+				}
+
+				if (!string.IsNullOrEmpty(orderNumber))
+				{
+					endpoint = "orders";
+					queryParams["number"] = Uri.EscapeDataString(orderNumber);
+				}
+
+				if (!string.IsNullOrEmpty(sortBy))
+					queryParams["sortBy"] = Uri.EscapeDataString(sortBy);
+
+				if (!string.IsNullOrEmpty(sortOrder))
+					queryParams["sortOrder"] = Uri.EscapeDataString(sortOrder);
+
+				var query = string.Join("&", queryParams.Select(kv => $"{kv.Key}={kv.Value}"));
+				var listUrl = $"{BaseUrl}/{endpoint}?" + query;//string.Join("&", queryParams);
+
+				_logger.LogInformation("Fetching orders: {Url}", listUrl);
+
+				var response = await _httpClient.GetFromJsonAsync<PaginatedResponse<ProductionOrderDto>>(listUrl);
+				return response ?? new PaginatedResponse<ProductionOrderDto>();
+			}
+			catch (Exception ex)
+			{
+				_logger.LogError(ex, "Error fetching orders");
+				return new PaginatedResponse<ProductionOrderDto>();
+			}
+		}
+
+		public async Task<ProductionOrderDto?> GetOrderByIdAsync(Guid id)
+		{
+			try
+			{
+				return await _httpClient.GetFromJsonAsync<ProductionOrderDto>($"{BaseUrl}/orders/{id}");
+			}
+			catch (Exception ex)
+			{
+				_logger.LogError(ex, "Error fetching order {Id}", id);
+				return null;
+			}
+		}
+
+		public async Task<List<WorkplaceDto>> GetActiveWorkplacesAsync()
+		{
+			try
+			{
+				var response = await _httpClient.GetFromJsonAsync<List<WorkplaceDto>>($"{BaseUrl}/workplaces/active");
+				return response ?? new List<WorkplaceDto>();
+			}
+			catch (Exception ex)
+			{
+				_logger.LogError(ex, "Error fetching active workplaces");
+				return new List<WorkplaceDto>();
+			}
+		}
+
+		// GET /api/workplaces/all
+		public async Task<List<WorkplaceDto>> GetAllWorkplacesAsync()
+		{
+			try
+			{
+				var response = await _httpClient.GetFromJsonAsync<List<WorkplaceDto>>($"{BaseUrl}/workplaces/all");
+				return response ?? new List<WorkplaceDto>();
+			}
+			catch (Exception ex)
+			{
+				_logger.LogError(ex, "Error fetching all workplaces");
+				return new List<WorkplaceDto>();
+			}
+		}
+
+		// GET /api/workplaces/{id}
+		public async Task<WorkplaceDto?> GetWorkplaceByIdAsync(Guid id)
+		{
+			try
+			{
+				return await _httpClient.GetFromJsonAsync<WorkplaceDto>($"{BaseUrl}/workplaces/{id}");
+			}
+			catch (Exception ex)
+			{
+				_logger.LogError(ex, "Error fetching workplace {Id}", id);
+				return null;
+			}
+		}
+
+		public async Task<bool> UpdateOrderStatusAsync(Guid id, string status)
+		{
+			try
+			{
+				var response = await _httpClient.PutAsJsonAsync(
+					$"{BaseUrl}/orders/{id}/status",
+					new { status });
+				return response.IsSuccessStatusCode;
+			}
+			catch (Exception ex)
+			{
+				_logger.LogError(ex, "Error updating status for order {Id}", id);
+				return false;
+			}
+		}
+
+		public async Task<bool> UpdateMasterNotesAsync(Guid id, string notes)
+		{
+			try
+			{
+				var response = await _httpClient.PutAsJsonAsync(
+					$"{BaseUrl}/orders/{id}/notes",
+					new { masterNotes = notes });
+				return response.IsSuccessStatusCode;
+			}
+			catch (Exception ex)
+			{
+				_logger.LogError(ex, "Error updating notes for order {Id}", id);
 				return false;
 			}
 		}
