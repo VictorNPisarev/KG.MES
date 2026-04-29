@@ -1,0 +1,282 @@
+@page "/"
+@using Microsoft.AspNetCore.Components.Web
+@using KG.MES.Shared.Models.Dto
+@using KG.MES.Shared.Services
+@inject ProductionApiService ApiService
+
+
+<PageTitle>Заказы в производстве</PageTitle>
+
+<div class="container-fluid py-4">
+	<!-- Sticky заголовок -->
+	<div class="sticky-header">
+		<div class="container-fluid">
+			<div class="row align-items-center">
+				<div class="col">
+					<h1 class="display-6 mb-1">
+						<i class="bi bi-clipboard-check"></i>  @Title
+					</h1>
+				</div>
+				<div class="col-auto">
+					@HeaderActions
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- Фильтры -->
+	<div class="row mt-4 g-2">
+		<div class="col-md-2">
+			<select class="form-select" @bind="selectedWorkplaceId">
+				<option value="">Все участки</option>
+				@foreach (var workplace in workplaces)
+				{
+					<option value="@workplace.Id">@workplace.Name</option>
+				}
+			</select>
+		</div>
+		<div class="col-md-2">
+			<input class="form-control" 
+				type="text" 
+				placeholder="Номер заказа" 
+				@bind="searchNumber"
+				@onkeyup="OnSearchKeyUp" />
+		</div>
+		<div class="col-md-2">
+			<select class="form-select" @bind="sortBy">
+				<option value="ready_date">По дате готовности</option>
+				<option value="order_number">По номеру заказа</option>
+				<option value="current_status">По статусу</option>
+				<option value="window_count">По количеству окон</option>
+			</select>
+		</div>
+		<div class="col-md-1">
+			<select class="form-select" @bind="sortOrder">
+				<option value="asc">↑</option>
+				<option value="desc">↓</option>
+			</select>
+		</div>
+		<div class="col-md-1">
+			<select class="form-select" @bind="pageSize" @bind:after="OnPageSizeChanged">
+				<option value="20">20</option>
+				<option value="50">50</option>
+				<option value="100">100</option>
+			</select>
+		</div>
+		<div class="col-md-2">
+			<button class="btn btn-primary w-100" @onclick="ApplyFilters">
+				<i class="bi bi-search"></i> Найти
+			</button>
+		</div>
+	</div>
+	<!-- Таблица -->
+	@if (isLoading)
+	{
+		<div class="text-center py-5">
+			<div class="spinner-border text-primary" role="status">
+				<span class="visually-hidden">Загрузка...</span>
+			</div>
+			<p class="text-muted mt-2">Загружаем заказы...</p>
+		</div>
+	}
+	else if (orders.Data.Any())
+	{
+		<div class="table-responsive mt-3">
+			<table class="table table-hover">
+				<thead class="table-light">
+					<tr>
+						<th>№ заказа</th>
+						<th>Контрагент</th>
+						<th>Статус</th>
+						<th>Дата запуска</th>
+						<th>План. готовность</th>
+						<th>Изделий</th>
+						<th>Сумма</th>
+						<th></th>
+					</tr>
+				</thead>
+				<tbody>
+					@foreach (var order in orders.Data)
+					{
+						<tr>
+							<td><strong>@order.OrderNumber</strong></td>
+							<td>@order.CustomerName</td>
+							<td>
+								<span class="badge @GetStatusClass(order.Status ?? "none")">@order.Status</span>
+							</td>
+							<td>@order.StartDate.ToString("dd.MM.yyyy")</td>
+							<td>@order.ReadyDate?.ToString("dd.MM.yyyy")</td>
+							<td>@order.WindowCount</td>
+							<td>@order.TotalAmount.ToString("C")</td>
+							<td>
+								<button class="btn btn-sm btn-outline-primary" @onclick="() => OpenOrder(order)">
+									<i class="bi bi-eye"></i>
+								</button>
+							</td>
+						</tr>
+					}
+				</tbody>
+			</table>
+		</div>
+
+		<!-- Пагинация -->
+		<div class="d-flex justify-content-between align-items-center mt-3">
+			<div class="text-muted">
+				Показано @((orders.Page - 1) * orders.Limit + 1)-@(Math.Min(orders.Page * orders.Limit, orders.Total)) из @orders.Total
+			</div>
+			<nav>
+				<ul class="pagination mb-0">
+					<li class="page-item @(orders.HasPreviousPage ? "" : "disabled")">
+						<button class="page-link" @onclick="() => GoToPage(1)" disabled="@(!orders.HasPreviousPage)">
+							<i class="bi bi-chevron-double-left"></i>
+						</button>
+					</li>
+					<li class="page-item @(orders.HasPreviousPage ? "" : "disabled")">
+						<button class="page-link" @onclick="() => GoToPage(orders.Page - 1)" disabled="@(!orders.HasPreviousPage)">
+							<i class="bi bi-chevron-left"></i>
+						</button>
+					</li>
+					
+					@foreach (var pageNum in GetPageNumbers())
+					{
+						<li class="page-item @(pageNum == orders.Page ? "active" : "")">
+							<button class="page-link" @onclick="() => GoToPage(pageNum)">@pageNum</button>
+						</li>
+					}
+					
+					<li class="page-item @(orders.HasNextPage ? "" : "disabled")">
+						<button class="page-link" @onclick="() => GoToPage(orders.Page + 1)" disabled="@(!orders.HasNextPage)">
+							<i class="bi bi-chevron-right"></i>
+						</button>
+					</li>
+					<li class="page-item @(orders.HasNextPage ? "" : "disabled")">
+						<button class="page-link" @onclick="() => GoToPage(orders.TotalPages)" disabled="@(!orders.HasNextPage)">
+							<i class="bi bi-chevron-double-right"></i>
+						</button>
+					</li>
+				</ul>
+			</nav>
+		</div>
+	}
+	else
+	{
+		<div class="text-center py-5">
+			<i class="bi bi-inbox display-1 text-muted"></i>
+			<p class="text-muted mt-3">Нет заказов</p>
+		</div>
+	}
+</div>
+
+@code {
+	[Parameter] public string Title { get; set; } = "Заказы";
+	[Parameter] public bool ShowActions { get; set; } = true;
+	[Parameter] public RenderFragment? HeaderActions { get; set; }
+	[Parameter] public EventCallback<ProductionOrderDto> OnOrderClick { get; set; }
+	private PaginatedResponse<ProductionOrderDto> orders = new();
+	private bool isLoading = false;
+	private string searchNumber = "";
+	private int currentPage = 1;
+	private int pageSize = 50;
+	private string sortBy = "ready_date";
+	private string sortOrder = "asc";
+	private List<WorkplaceDto> workplaces = new();
+	private Guid? selectedWorkplaceId;
+
+	protected override async Task OnInitializedAsync()
+	{
+		workplaces = await ApiService.GetActiveWorkplacesAsync();
+		await LoadOrders();
+	}
+
+	private async Task LoadOrders()
+	{
+		isLoading = true;
+		StateHasChanged();
+
+		try
+		{
+			orders = await ApiService.GetOrdersAsync(
+				workplaceId: selectedWorkplaceId,
+				orderNumber: string.IsNullOrEmpty(searchNumber) ? null : searchNumber,
+				page: currentPage,
+				limit: pageSize,
+				sortBy: sortBy,
+				sortOrder: sortOrder
+			);
+
+			Console.WriteLine("LoadOrders() -> try");
+
+		}
+		catch (Exception ex)
+		{
+			Console.WriteLine($"Error loading orders: {ex.Message}");
+		}
+		finally
+		{
+			Console.WriteLine($"LoadOrders() -> finally. Orders.count:{orders.Data.Count}");
+			isLoading = false;
+			StateHasChanged();
+		}
+	}
+
+	private async Task ApplyFilters()
+	{
+		currentPage = 1; // Сброс на первую страницу при новых фильтрах
+		await LoadOrders();
+	}
+
+	private async Task RefreshOrders()
+	{
+		await LoadOrders();
+	}
+
+	private async Task GoToPage(int page)
+	{
+		currentPage = page;
+		await LoadOrders();
+	}
+
+	private async Task OnPageSizeChanged()
+	{
+		currentPage = 1;
+		await LoadOrders();
+	}
+
+	private async Task OnSearchKeyUp(KeyboardEventArgs e)
+	{
+		if (e.Key == "Enter")
+		{
+			await ApplyFilters();
+		}
+	}
+
+	private void OpenOrder(ProductionOrderDto order)
+	{
+		// TODO: переход на детали заказа
+		Console.WriteLine($"Open order: {order.OrderNumber}");
+	}
+
+	private List<int> GetPageNumbers()
+	{
+		var pages = new List<int>();
+		var start = Math.Max(1, orders.Page - 2);
+		var end = Math.Min(orders.TotalPages, orders.Page + 2);
+
+		for (int i = start; i <= end; i++)
+		{
+			pages.Add(i);
+		}
+
+		return pages;
+	}
+
+	private string GetStatusClass(string status) => status.ToLower() switch
+	{
+		"none" => "bg-secondary",
+		"торцовка" => "bg-warning",
+		"покраска" => "bg-primary",
+		"готово" => "bg-success",
+		"отгружен" => "bg-dark",
+		_ => "bg-light text-dark"
+	};
+}

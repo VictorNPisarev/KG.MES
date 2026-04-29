@@ -16,4 +16,9 @@
     <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="10.0.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\KG.MES.Shared\KG.MES.Shared.csproj" />
+  </ItemGroup>
+
+
 </Project>
