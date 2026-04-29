@@ -3,7 +3,7 @@ using KG.MES.Shared.Attributes;
 
 namespace KG.MES.Shared.Models.Dto
 {
-	public class ProductionOrderDto
+	public class MastersProductionOrderDto
 	{
 		[JsonPropertyName("id")]
 		[Column("ID", Visible = false)]
@@ -19,7 +19,7 @@ namespace KG.MES.Shared.Models.Dto
 
 
 		[JsonPropertyName("created_at")]
-		[Column("Дата запуска", Order = 4, DisplayFormat = "dd.MM.yyyy")]
+		[Column("Дата запуска", Visible = false)]
 		public DateTime StartDate { get; set; }
 
 		[JsonPropertyName("ready_date")]
@@ -43,15 +43,15 @@ namespace KG.MES.Shared.Models.Dto
 		public double? PlateArea { get; set; }
 
 		[JsonPropertyName("is_econom")]
-		[Column("Эконом", Order = 10)]
+		[Column("Эконом", Visible = false)]
 		public bool IsEconom { get; set; }
 
 		[JsonPropertyName("is_claim")]
-		[Column("Рекламация", Order = 11)]
+		[Column("Рекламация", Visible = false)]
 		public bool IsClaim { get; set; }
 
 		[JsonPropertyName("is_only_paid")]
-		[Column("Оплачен, не запущен", Order = 12)]
+		[Column("Оплачен, не запущен", Visible = false)]
 		public bool IsOnlyPaid { get; set; }
 
 		[JsonPropertyName("production_order_id")]

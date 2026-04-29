@@ -1,8 +1,10 @@
-@page "/old_index"
+@typeparam TOrder
 @using Microsoft.AspNetCore.Components.Web
 @using KG.MES.Shared.Models.Dto
-@using KG.MES.Main.Services
 @using KG.MES.Shared.Services
+@using System.Reflection
+@using KG.MES.Shared.Helpers
+
 @inject ProductionApiService ApiService
 
 
@@ -15,19 +17,15 @@
 			<div class="row align-items-center">
 				<div class="col">
 					<h1 class="display-6 mb-1">
-						<i class="bi bi-clipboard-check"></i> Заказы в производстве
+						<i class="bi bi-clipboard-check"></i>  @Title
 					</h1>
 				</div>
-				<div class="col-auto">
-					<div class="btn-group" role="group">
-						<NavLink href="/upload" class="btn btn-primary">
-							<i class="bi bi-upload"></i> Загрузить XML
-						</NavLink>
-						<button class="btn btn-outline-secondary" @onclick="RefreshOrders">
-							<i class="bi bi-arrow-clockwise"></i>
-						</button>
+				@if(ShowActions)
+				{
+					<div class="col-auto">
+						@HeaderActions
 					</div>
-				</div>
+				}
 			</div>
 		</div>
 	</div>
@@ -93,38 +91,50 @@
 			<table class="table table-hover">
 				<thead class="table-light">
 					<tr>
-						<th>№ заказа</th>
-						<th>Контрагент</th>
-						<th>Статус</th>
-						<th>Дата запуска</th>
-						<th>План. готовность</th>
-						<th>Изделий</th>
-						<th>Сумма</th>
-						<th></th>
+						@foreach (var col in columns)
+						{
+							<th>@col.Title</th>
+						}
+						@if (ShowActions)
+						{
+							<th></th>
+						}
 					</tr>
 				</thead>
 				<tbody>
 					@foreach (var order in orders.Data)
 					{
 						<tr>
-							<td><strong>@order.OrderNumber</strong></td>
-							<td>@order.CustomerName</td>
-							<td>
-								<span class="badge @GetStatusClass(order.Status ?? "none")">@order.Status</span>
-							</td>
-							<td>@order.StartDate.ToString("dd.MM.yyyy")</td>
-							<td>@order.ReadyDate?.ToString("dd.MM.yyyy")</td>
-							<td>@order.WindowCount</td>
-							<td>@order.TotalAmount.ToString("C")</td>
-							<td>
-								<button class="btn btn-sm btn-outline-primary" @onclick="() => OpenOrder(order)">
-									<i class="bi bi-eye"></i>
-								</button>
-							</td>
+							@foreach (var col in columns)
+							{
+								<td>
+									@if (col.PropertyName == nameof(ProductionOrderDto.Status))
+									{
+										@*<StatusBadge Status="@order.Status" />*@
+									}
+									else
+									{
+										@if (order != null)
+										{
+											@ColumnHelper.GetFormattedValue(order, col)
+										}
+									}
+								</td>
+							}
+							@if (ShowActions)
+							{
+								<td>
+									<button class="btn btn-sm btn-outline-primary" 
+											@onclick="() => OnOrderClick.InvokeAsync(order)">
+										<i class="bi bi-eye"></i>
+									</button>
+								</td>
+							}
 						</tr>
 					}
 				</tbody>
 			</table>
+
 		</div>
 
 		<!-- Пагинация -->
@@ -176,14 +186,21 @@
 </div>
 
 @code {
-	private PaginatedResponse<ProductionOrderDto> orders = new();
+   [Parameter] public string Endpoint { get; set; } = "orders/all";
+	[Parameter] public string Title { get; set; } = "Заказы";
+	[Parameter] public bool ShowActions { get; set; } = true;
+	[Parameter] public EventCallback<TOrder> OnOrderClick { get; set; }
+	[Parameter] public RenderFragment? HeaderActions { get; set; }
+
+	private PaginatedResponse<TOrder> orders = new();
+	private List<WorkplaceDto> workplaces = new();
+	private List<ColumnInfo> columns = ColumnHelper.GetColumns<TOrder>();
 	private bool isLoading = false;
 	private string searchNumber = "";
 	private int currentPage = 1;
 	private int pageSize = 50;
 	private string sortBy = "ready_date";
 	private string sortOrder = "asc";
-	private List<WorkplaceDto> workplaces = new();
 	private Guid? selectedWorkplaceId;
 
 	protected override async Task OnInitializedAsync()
@@ -199,7 +216,8 @@
 
 		try
 		{
-			orders = await ApiService.GetOrdersAsync(
+			orders = await ApiService.GetOrdersAsync<TOrder>(
+				endpoint: Endpoint,
 				workplaceId: selectedWorkplaceId,
 				orderNumber: string.IsNullOrEmpty(searchNumber) ? null : searchNumber,
 				page: currentPage,
@@ -274,11 +292,11 @@
 		return pages;
 	}
 
-	private string GetStatusClass(string status) => status switch
+	private string GetStatusClass(string status) => status.ToLower() switch
 	{
 		"none" => "bg-secondary",
-		"pending" => "bg-warning",
-		"active" => "bg-primary",
+		"торцовка" => "bg-warning",
+		"покраска" => "bg-primary",
 		"готово" => "bg-success",
 		"отгружен" => "bg-dark",
 		_ => "bg-light text-dark"
