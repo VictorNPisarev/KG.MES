@@ -4,9 +4,7 @@ namespace KG.MES.Shared.Helpers
 	{
 		public string PropertyName { get; set; } = string.Empty;
 		public string Title { get; set; } = string.Empty;
-		public bool Visible { get; set; }
 		public string? Format { get; set; }
-		public int Order { get; set; }
 		public bool IsBadge { get; set; }
 		public string? BadgeProperty { get; set; } // если IsBadge и значение берется из другого свойства
 	}
