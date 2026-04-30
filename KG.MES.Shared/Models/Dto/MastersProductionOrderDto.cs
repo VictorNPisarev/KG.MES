@@ -13,34 +13,33 @@ namespace KG.MES.Shared.Models.Dto
 		[Column("№ заказа", Order = 1)]
 		public string OrderNumber { get; set; } = string.Empty;
 
+		[JsonPropertyName("ready_date")]
+		[Column("Готовность", Order = 2, DisplayFormat = "dd.MM.yyyy")]
+		public DateTime? ReadyDate { get; set; }
+
 		[JsonPropertyName("current_status")]
 		[Column("Статус", Order = 3)]
 		public string? Status { get; set; }
 
+		[JsonPropertyName("window_count")]
+		[Column("Окна, шт", Order = 4)]
+		public int WindowCount { get; set; }
+
+		[JsonPropertyName("window_area")]
+		[Column("Окна, м2", Order = 5, DisplayFormat = "F2")]
+		public double? WindowArea { get; set; }
+
+		[JsonPropertyName("plate_count")]
+		[Column("Щитовые, шт", Order = 6)]
+		public int PlateCount { get; set; }
+
+		[JsonPropertyName("plate_area")]
+		[Column("Щитовые, м2", Order = 7, DisplayFormat = "F2")]
+		public double? PlateArea { get; set; }
 
 		[JsonPropertyName("created_at")]
 		[Column("Дата запуска", Visible = false)]
 		public DateTime StartDate { get; set; }
-
-		[JsonPropertyName("ready_date")]
-		[Column("Готовность", Order = 5, DisplayFormat = "dd.MM.yyyy")]
-		public DateTime? ReadyDate { get; set; }
-
-		[JsonPropertyName("window_count")]
-		[Column("Окна, шт", Order = 6)]
-		public int WindowCount { get; set; }
-
-		[JsonPropertyName("window_area")]
-		[Column("Окна, м2", Order = 7, DisplayFormat = "F2")]
-		public double? WindowArea { get; set; }
-
-		[JsonPropertyName("plate_count")]
-		[Column("Щитовые, шт", Order = 8)]
-		public int PlateCount { get; set; }
-
-		[JsonPropertyName("plate_area")]
-		[Column("Щитовые, м2", Order = 9, DisplayFormat = "F2")]
-		public double? PlateArea { get; set; }
 
 		[JsonPropertyName("is_econom")]
 		[Column("Эконом", Visible = false)]
@@ -71,7 +70,7 @@ namespace KG.MES.Shared.Models.Dto
 		public string? CurrentWorkplaceName { get; set; }
 
 		[JsonPropertyName("master_notes")]
-		[Column("Заметки мастера", Visible = false)]
+		[Column("Заметки мастера", Order = 9)]
 		public string? MasterNotes { get; set; }
 	}
 

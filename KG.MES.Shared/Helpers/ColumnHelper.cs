@@ -3,15 +3,6 @@ using KG.MES.Shared.Attributes;
 
 namespace KG.MES.Shared.Helpers
 {
-	public class ColumnInfo
-	{
-		public string PropertyName { get; set; } = string.Empty;
-		public string Title { get; set; } = string.Empty;
-		public bool Visible { get; set; }
-		public string? Format { get; set; }
-		public int Order { get; set; }
-	}
-
 	public static class ColumnHelper
 	{
 		public static List<ColumnInfo> GetColumns<T>()
@@ -30,7 +21,8 @@ namespace KG.MES.Shared.Helpers
 					Title = x.Attr!.Title,
 					Visible = x.Attr.Visible,
 					Format = x.Attr.DisplayFormat,
-					Order = x.Attr.Order
+					Order = x.Attr.Order,
+					IsBadge = x.Attr.IsBadge
 				})
 				.ToList();
 		}

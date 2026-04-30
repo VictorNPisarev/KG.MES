@@ -95,10 +95,7 @@
 						{
 							<th>@col.Title</th>
 						}
-						@if (ShowActions)
-						{
-							<th></th>
-						}
+						<th></th>
 					</tr>
 				</thead>
 				<tbody>
@@ -108,9 +105,18 @@
 							@foreach (var col in columns)
 							{
 								<td>
-									@if (col.PropertyName == nameof(ProductionOrderDto.Status))
+									@if (col.IsBadge)
 									{
-										@*<StatusBadge Status="@order.Status" />*@
+										@if (order != null)
+										{
+											var value = order.GetType().GetProperty(col.PropertyName)?.GetValue(order);
+											var text = BadgeHelper.GetFormattedBadgeValue(order, col);
+											var cssClass = BadgeHelper.GetBadgeClass(
+												value?.ToString(), 
+												value is bool);
+											
+											<span class="badge @cssClass">@text</span>
+										}
 									}
 									else
 									{
@@ -121,15 +127,12 @@
 									}
 								</td>
 							}
-							@if (ShowActions)
-							{
-								<td>
-									<button class="btn btn-sm btn-outline-primary" 
-											@onclick="() => OnOrderClick.InvokeAsync(order)">
-										<i class="bi bi-eye"></i>
-									</button>
-								</td>
-							}
+							<td>
+								<button class="btn btn-sm btn-outline-primary" 
+										@onclick="() => OnOrderClick.InvokeAsync(order)">
+									<i class="bi bi-eye"></i>
+								</button>
+							</td>
 						</tr>
 					}
 				</tbody>
@@ -186,7 +189,7 @@
 </div>
 
 @code {
-   [Parameter] public string Endpoint { get; set; } = "orders/all";
+	[Parameter] public string Endpoint { get; set; } = "orders";
 	[Parameter] public string Title { get; set; } = "Заказы";
 	[Parameter] public bool ShowActions { get; set; } = true;
 	[Parameter] public EventCallback<TOrder> OnOrderClick { get; set; }
@@ -194,7 +197,7 @@
 
 	private PaginatedResponse<TOrder> orders = new();
 	private List<WorkplaceDto> workplaces = new();
-	private List<ColumnInfo> columns = ColumnHelper.GetColumns<TOrder>();
+	private List<ColumnInfo> columns = ColumnHelper.GetColumns<TOrder>().Where(c => c.Visible).ToList();
 	private bool isLoading = false;
 	private string searchNumber = "";
 	private int currentPage = 1;
@@ -291,14 +294,4 @@
 
 		return pages;
 	}
-
-	private string GetStatusClass(string status) => status.ToLower() switch
-	{
-		"none" => "bg-secondary",
-		"торцовка" => "bg-warning",
-		"покраска" => "bg-primary",
-		"готово" => "bg-success",
-		"отгружен" => "bg-dark",
-		_ => "bg-light text-dark"
-	};
 }

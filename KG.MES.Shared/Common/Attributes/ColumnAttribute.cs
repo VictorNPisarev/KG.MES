@@ -7,6 +7,7 @@ namespace KG.MES.Shared.Attributes
 		public bool Visible { get; set; } = true;
 		public string? DisplayFormat { get; set; }
 		public int Order { get; set; }
+		public bool IsBadge { get; set; }
 
 		public ColumnAttribute(string title)
 		{

@@ -1,3 +1,4 @@
 ﻿@page "/"
+@using KG.MES.Shared.Models.Dto
 
-<MastersOrderListView Endpoint="orders" Title="Производство"></MastersOrderListView>
+<OrderListView TOrder="ProductionOrderDto" Endpoint="orders" Title="Производство" ShowActions="false"></OrderListView>

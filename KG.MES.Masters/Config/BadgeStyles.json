@@ -1,0 +1,11 @@
+{
+	"extends": "base",
+	"statuses":
+	{
+		"торцовка": "bg-info",
+		"столярка": "bg-warning",
+		"профилирование": "bg-warning",
+		"сборка": "bg-primary",
+		"покраска": "bg-info"
+	}
+}
