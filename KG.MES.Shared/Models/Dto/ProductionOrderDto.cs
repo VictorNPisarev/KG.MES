@@ -14,7 +14,7 @@ namespace KG.MES.Shared.Models.Dto
 		public string OrderNumber { get; set; } = string.Empty;
 
 		[JsonPropertyName("current_status")]
-		[Column("Статус", Order = 3)]
+		[Column("Статус", Order = 3, IsBadge = true)]
 		public string? Status { get; set; }
 
 
@@ -43,15 +43,15 @@ namespace KG.MES.Shared.Models.Dto
 		public double? PlateArea { get; set; }
 
 		[JsonPropertyName("is_econom")]
-		[Column("Эконом", Order = 10)]
+		[Column("Эконом", Order = 10, IsBadge = true)]
 		public bool IsEconom { get; set; }
 
 		[JsonPropertyName("is_claim")]
-		[Column("Рекламация", Order = 11)]
+		[Column("Рекламация", Order = 11, IsBadge = true)]
 		public bool IsClaim { get; set; }
 
 		[JsonPropertyName("is_only_paid")]
-		[Column("Оплачен, не запущен", Order = 12)]
+		[Column("Оплачен, не запущен", Order = 12, IsBadge = true)]
 		public bool IsOnlyPaid { get; set; }
 
 		[JsonPropertyName("production_order_id")]

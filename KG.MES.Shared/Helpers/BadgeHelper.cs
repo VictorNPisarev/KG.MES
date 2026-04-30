@@ -1,4 +1,5 @@
 using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace KG.MES.Shared.Helpers
 {
@@ -29,18 +30,20 @@ namespace KG.MES.Shared.Helpers
 		private static void MergeConfig(string json)
 		{
 			var config = JsonSerializer.Deserialize<BadgeConfig>(json);
+
 			if (config?.Statuses != null)
 			{
 				foreach (var kvp in config.Statuses)
 					_statusStyles[kvp.Key.ToLower()] = kvp.Value;
 			}
+
 			if (config?.Booleans != null)
 			{
 				foreach (var kvp in config.Booleans)
 					_booleanStyles[kvp.Key] = kvp.Value;
 			}
 		}
-		
+
 		public static string GetBadgeClass(string? value, bool isBoolean = false)
 		{
 			if (string.IsNullOrEmpty(value))
@@ -68,9 +71,16 @@ namespace KG.MES.Shared.Helpers
 
 		private class BadgeConfig
 		{
+			[JsonPropertyName("statuses")]
 			public Dictionary<string, string> Statuses { get; set; } = new();
+
+			[JsonPropertyName("booleans")]
 			public Dictionary<string, string> Booleans { get; set; } = new();
+
+			[JsonPropertyName("defaultStatus")]
 			public string DefaultStatus { get; set; } = "bg-light text-dark";
+
+			[JsonPropertyName("defaultBoolean")]
 			public string DefaultBoolean { get; set; } = "bg-light text-dark";
 		}
 	}

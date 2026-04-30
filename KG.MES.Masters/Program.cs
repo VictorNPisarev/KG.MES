@@ -40,6 +40,9 @@ async Task LoadDataAsync(IServiceProvider services, IWebHostEnvironment env)
 		var baseConfig = Path.Combine(env.ContentRootPath, "..", "KG.MES.Shared", "Config", "BadgeStyles.Base.json");
 		var appConfig = Path.Combine(env.ContentRootPath, "Config", "BadgeStyles.json");
 
+		logger.LogInformation($"baseConfig: ${baseConfig}");
+		logger.LogInformation($"appConfig: ${appConfig}");
+
 		BadgeHelper.LoadConfig(baseConfig, appConfig);
 
 		logger.LogInformation("Badges config loaded successfully");

@@ -18,7 +18,7 @@ namespace KG.MES.Shared.Models.Dto
 		public DateTime? ReadyDate { get; set; }
 
 		[JsonPropertyName("current_status")]
-		[Column("Статус", Order = 3)]
+		[Column("Статус", Order = 3, IsBadge = true)]
 		public string? Status { get; set; }
 
 		[JsonPropertyName("window_count")]
