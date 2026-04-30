@@ -219,6 +219,44 @@ namespace KG.MES.Shared.Services
 			}
 		}
 
+		public async Task<PaginatedResponse<T>> GetOrdersAsync<T>(
+			string endpoint,  // "orders/all" или "orders/masters" или "orders/supply"
+			//string? status = null,
+			Guid? workplaceId = null,
+			string? orderNumber = null,
+			int page = 1,
+			int limit = 50,
+			string? sortBy = null,
+			string? sortOrder = null)
+		{
+			var queryParams = new Dictionary<string, string>
+			{
+				["page"] = page.ToString(),
+				["limit"] = limit.ToString()
+			};
+
+			//if (!string.IsNullOrEmpty(status))
+			//	queryParams["status"] = status;
+
+			if (workplaceId.HasValue && workplaceId != Guid.Empty)
+				queryParams["workplaceId"] = workplaceId.Value.ToString();
+
+			if (!string.IsNullOrEmpty(orderNumber))
+				queryParams["orderNumber"] = orderNumber;
+
+			if (!string.IsNullOrEmpty(sortBy))
+				queryParams["sortBy"] = sortBy;
+
+			if (!string.IsNullOrEmpty(sortOrder))
+				queryParams["sortOrder"] = sortOrder;
+
+			var query = string.Join("&", queryParams.Select(kv => $"{kv.Key}={kv.Value}"));
+			var url = $"{BaseUrl}/{endpoint}?{query}";
+
+			return await _httpClient.GetFromJsonAsync<PaginatedResponse<T>>(url)
+				?? new PaginatedResponse<T>();
+		}
+
 		public async Task<ProductionOrderDto?> GetOrderByIdAsync(Guid id)
 		{
 			try

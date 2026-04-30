@@ -1,7 +1,10 @@
-@page "/"
+@typeparam TOrder
 @using Microsoft.AspNetCore.Components.Web
 @using KG.MES.Shared.Models.Dto
 @using KG.MES.Shared.Services
+@using System.Reflection
+@using KG.MES.Shared.Helpers
+
 @inject ProductionApiService ApiService
 
 
@@ -88,13 +91,10 @@
 			<table class="table table-hover">
 				<thead class="table-light">
 					<tr>
-						<th>№ заказа</th>
-						<th>Контрагент</th>
-						<th>Статус</th>
-						<th>Дата запуска</th>
-						<th>План. готовность</th>
-						<th>Изделий</th>
-						<th>Сумма</th>
+						@foreach (var col in columns)
+						{
+							<th>@col.Title</th>
+						}
 						<th></th>
 					</tr>
 				</thead>
@@ -102,17 +102,34 @@
 					@foreach (var order in orders.Data)
 					{
 						<tr>
-							<td><strong>@order.OrderNumber</strong></td>
-							<td>@order.CustomerName</td>
+							@foreach (var col in columns)
+							{
+								<td>
+									@if (col.IsBadge)
+									{
+										@if (order != null)
+										{
+											var value = order.GetType().GetProperty(col.PropertyName)?.GetValue(order);
+											var text = BadgeHelper.GetFormattedBadgeValue(order, col);
+											var cssClass = BadgeHelper.GetBadgeClass(
+												value?.ToString(), 
+												value is bool);
+											
+											<span class="badge @cssClass">@text</span>
+										}
+									}
+									else
+									{
+										@if (order != null)
+										{
+											@ColumnHelper.GetFormattedValue(order, col)
+										}
+									}
+								</td>
+							}
 							<td>
-								<span class="badge @GetStatusClass(order.Status ?? "none")">@order.Status</span>
-							</td>
-							<td>@order.StartDate.ToString("dd.MM.yyyy")</td>
-							<td>@order.ReadyDate?.ToString("dd.MM.yyyy")</td>
-							<td>@order.WindowCount</td>
-							<td>@order.TotalAmount.ToString("C")</td>
-							<td>
-								<button class="btn btn-sm btn-outline-primary" @onclick="() => OpenOrder(order)">
+								<button class="btn btn-sm btn-outline-primary" 
+										@onclick="() => OnOrderClick.InvokeAsync(order)">
 									<i class="bi bi-eye"></i>
 								</button>
 							</td>
@@ -120,6 +137,7 @@
 					}
 				</tbody>
 			</table>
+
 		</div>
 
 		<!-- Пагинация -->
@@ -171,18 +189,21 @@
 </div>
 
 @code {
+	[Parameter] public string Endpoint { get; set; } = "orders";
 	[Parameter] public string Title { get; set; } = "Заказы";
 	[Parameter] public bool ShowActions { get; set; } = true;
+	[Parameter] public EventCallback<TOrder> OnOrderClick { get; set; }
 	[Parameter] public RenderFragment? HeaderActions { get; set; }
-	[Parameter] public EventCallback<ProductionOrderDto> OnOrderClick { get; set; }
-	private PaginatedResponse<ProductionOrderDto> orders = new();
+
+	private PaginatedResponse<TOrder> orders = new();
+	private List<WorkplaceDto> workplaces = new();
+	private List<ColumnInfo> columns = ColumnHelper.GetColumns<TOrder>().Where(c => c.Visible).ToList();
 	private bool isLoading = false;
 	private string searchNumber = "";
 	private int currentPage = 1;
 	private int pageSize = 50;
 	private string sortBy = "ready_date";
 	private string sortOrder = "asc";
-	private List<WorkplaceDto> workplaces = new();
 	private Guid? selectedWorkplaceId;
 
 	protected override async Task OnInitializedAsync()
@@ -198,7 +219,8 @@
 
 		try
 		{
-			orders = await ApiService.GetOrdersAsync(
+			orders = await ApiService.GetOrdersAsync<TOrder>(
+				endpoint: Endpoint,
 				workplaceId: selectedWorkplaceId,
 				orderNumber: string.IsNullOrEmpty(searchNumber) ? null : searchNumber,
 				page: currentPage,
@@ -272,14 +294,4 @@
 
 		return pages;
 	}
-
-	private string GetStatusClass(string status) => status.ToLower() switch
-	{
-		"none" => "bg-secondary",
-		"торцовка" => "bg-warning",
-		"покраска" => "bg-primary",
-		"готово" => "bg-success",
-		"отгружен" => "bg-dark",
-		_ => "bg-light text-dark"
-	};
 }

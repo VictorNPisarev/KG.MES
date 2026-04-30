@@ -1,0 +1,20 @@
+{
+	"statuses":
+	{
+		"none": "bg-secondary",
+		"торцовка": "bg-warning",
+		"столярка": "bg-warning",
+		"профилирование": "bg-warning",
+		"сборка": "bg-warning",
+		"покраска": "bg-primary",
+		"готово": "bg-success",
+		"отгружен": "bg-dark"
+	},
+	"booleans":
+	{
+		"True": "bg-success",
+		"False": "bg-secondary"
+	},
+	"defaultStatus": "bg-light text-dark",
+	"defaultBoolean": "bg-light text-dark"
+}

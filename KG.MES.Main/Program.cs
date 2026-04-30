@@ -2,6 +2,7 @@ using KG.MES.Main.Interfaces;
 using KG.MES.Main.Models;
 using KG.MES.Main.Models.Xml;
 using KG.MES.Main.Services;
+using KG.MES.Shared.Helpers;
 using KG.MES.Shared.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -62,5 +63,20 @@ async Task LoadDataAsync(IServiceProvider services, IWebHostEnvironment env)
 	catch (Exception ex)
 	{
 		logger.LogError(ex, "Failed to load indicators and categories");
+	}
+
+	//Загрузка конфига для выделения цветом полей-ярлыков
+	try
+	{
+		var baseConfig = Path.Combine(env.ContentRootPath, "..", "KG.MES.Shared", "Config", "BadgeStyles.Base.json");
+		var appConfig = Path.Combine(env.ContentRootPath, "Config", "BadgeStyles.json");
+	
+		BadgeHelper.LoadConfig(baseConfig, appConfig);
+		
+		logger.LogInformation("Badges config loaded successfully");
+	}
+	catch (Exception ex)
+	{
+		logger.LogError(ex, "Failed to load badges config");
 	}
 }
