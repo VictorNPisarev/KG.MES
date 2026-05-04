@@ -1,0 +1,201 @@
+@typeparam TOrder
+@using KG.MES.Shared.Models.Dto
+@using KG.MES.Shared.Services
+@using KG.MES.Shared.Helpers
+@using Microsoft.JSInterop
+
+@inject ProductionApiService ApiService
+@inject IJSRuntime JSRuntime
+
+@if (isLoading)
+{
+	<div class="text-center py-5">
+		<div class="spinner-border text-primary" role="status">
+			<span class="visually-hidden">Загрузка...</span>
+		</div>
+	</div>
+}
+else if (order != null)
+{
+	<div class="card shadow-sm">
+		<div class="card-header d-flex justify-content-between align-items-center">
+			<h5 class="mb-0">
+				<i class="bi bi-file-text"></i> Заказ №@GetPropertyValue(order, "OrderNumber")
+			</h5>
+			<div>
+				@HeaderActions
+				<button class="btn btn-sm btn-outline-secondary ms-2" @onclick="() => isSettingsOpen = !isSettingsOpen">
+					<i class="bi bi-gear"></i>
+				</button>
+			</div>
+		</div>
+
+		@if (isSettingsOpen)
+		{
+			<div class="card-body bg-light border-bottom">
+				<h6>Настройка полей</h6>
+				<div class="row">
+					@foreach (var setting in fieldSettings.OrderBy(s => s.Order))
+					{
+						var info = fieldInfos.FirstOrDefault(i => i.PropertyName == setting.PropertyName);
+						var title = info?.Title ?? setting.PropertyName;
+						<div class="col-md-6">
+							<div class="form-check">
+								<input type="checkbox" class="form-check-input" id="field-@setting.PropertyName"
+									checked="@setting.Visible"
+									@onchange="(e) => ToggleField(setting.PropertyName, (bool)(e.Value ?? false))" />
+								<label class="form-check-label" for="field-@setting.PropertyName">
+									@title
+								</label>
+							</div>
+						</div>
+					}
+				</div>
+				<button class="btn btn-sm btn-outline-primary mt-2" @onclick="ResetFields">
+					<i class="bi bi-arrow-counterclockwise"></i> Сбросить
+				</button>
+			</div>
+		}
+
+		<div class="card-body">
+			<div class="row">
+				@foreach (var field in BuildVisibleFields())
+				{
+					<div class="@GetFieldClass(field.Setting.Width)">
+						<label class="text-muted small">@field.Info.Title</label>
+						<div class="fw-bold">
+							@if (field.Info.IsBadge)
+							{
+								var value = order.GetType().GetProperty(field.Info.PropertyName)?.GetValue(order);
+								<span class="badge @BadgeHelper.GetBadgeClass(value?.ToString(), value is bool)">
+									@BadgeHelper.GetFormattedBadgeValue(order, field.Info)
+								</span>
+							}
+							else
+							{
+								@ColumnHelper.GetFormattedValue(order, field.Info)
+							}
+						</div>
+					</div>
+				}
+			</div>
+		</div>
+
+		<div class="card-footer text-muted">
+			@Footer
+		</div>
+	</div>
+}
+else
+{
+	<div class="alert alert-warning">Заказ не найден</div>
+}
+
+@code {
+	[Parameter] public string Endpoint { get; set; } = "orders";
+	[Parameter] public Guid OrderId { get; set; }
+	[Parameter] public RenderFragment? HeaderActions { get; set; }
+	[Parameter] public RenderFragment? Footer { get; set; }
+
+	private TOrder? order;
+	private List<ColumnInfo> fieldInfos = new();
+	private List<ColumnSetting> fieldSettings = new();
+	private bool isLoading = true;
+	private bool isSettingsOpen = false;
+
+	private string cardKey => $"{Endpoint}_{typeof(TOrder).Name}_card";
+
+	protected override async Task OnInitializedAsync()
+	{
+		fieldInfos = ColumnHelper.GetColumns<TOrder>();
+
+		await LoadSettings();
+		await LoadOrder();
+	}
+
+	private async Task LoadSettings()
+	{
+		try
+		{
+			var json = await JSRuntime.InvokeAsync<string>("localStorage.getItem", $"card_settings_{cardKey}");
+			fieldSettings = TableSettingsManager.GetSettings<TOrder>(json);
+		}
+		catch
+		{
+			fieldSettings = TableSettingsManager.GetDefaultSettings<TOrder>();
+		}
+	}
+
+	private List<(ColumnInfo Info, ColumnSetting Setting)> BuildVisibleFields()
+	{
+		return fieldSettings
+		.Where(s => s.Visible)
+		.Join(fieldInfos,
+		s => s.PropertyName,
+		i => i.PropertyName,
+		(s, i) => (Info: i, Setting: s))
+		.OrderBy(x => x.Setting.Order)
+		.ToList();
+	}
+
+	private string GetFieldClass(int width)
+	{
+		return width switch
+		{
+			4 => "col-md-4 mb-3",
+			6 => "col-md-6 mb-3",
+			8 => "col-md-8 mb-3",
+			12 => "col-12 mb-3",
+			_ => "col-md-6 mb-3"
+		};
+	}
+
+	private async Task LoadOrder()
+	{
+		isLoading = true;
+		StateHasChanged();
+
+		try
+		{
+			order = await ApiService.GetOrderByIdAsync<TOrder>(Endpoint, OrderId);
+		}
+		catch (Exception ex)
+		{
+			Console.WriteLine($"Error loading order: {ex.Message}");
+		}
+		finally
+		{
+			isLoading = false;
+			StateHasChanged();
+		}
+	}
+
+	private async Task ToggleField(string propertyName, bool visible)
+	{
+		var setting = fieldSettings.FirstOrDefault(s => s.PropertyName == propertyName);
+		if (setting != null)
+		{
+			setting.Visible = visible;
+			await SaveSettings();
+			StateHasChanged();
+		}
+	}
+
+	private async Task ResetFields()
+	{
+		fieldSettings = TableSettingsManager.GetDefaultSettings<TOrder>();
+		await SaveSettings();
+		StateHasChanged();
+	}
+
+	private async Task SaveSettings()
+	{
+		var json = TableSettingsManager.Serialize(fieldSettings);
+		await JSRuntime.InvokeVoidAsync("localStorage.setItem", $"card_settings_{cardKey}", json);
+	}
+
+	private string? GetPropertyValue(TOrder obj, string propertyName)
+	{
+		return obj?.GetType().GetProperty(propertyName)?.GetValue(obj)?.ToString();
+	}
+}

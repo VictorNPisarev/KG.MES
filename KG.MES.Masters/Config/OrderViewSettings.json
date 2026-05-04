@@ -1,0 +1,18 @@
+{
+	"listEndpoint": "orders",
+	"cardEndpoint": "orders",
+	"title": "Заказы (Мастера)",
+	"showActions": false,
+	"canEdit": true,
+	"canExport": false,
+	"canDelete": false,
+	"additional":
+	{
+		"allowedStatuses":
+		[
+			"торцовка",
+			"столярка",
+			"покраска"
+		]
+	}
+}
