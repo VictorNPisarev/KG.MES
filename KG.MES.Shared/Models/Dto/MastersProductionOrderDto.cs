@@ -42,15 +42,15 @@ namespace KG.MES.Shared.Models.Dto
 		public DateTime StartDate { get; set; }
 
 		[JsonPropertyName("is_econom")]
-		[Column("Эконом", Visible = false)]
+		[Column("Эконом", Visible = false, IsBadge = true)]
 		public bool IsEconom { get; set; }
 
 		[JsonPropertyName("is_claim")]
-		[Column("Рекламация", Visible = false)]
+		[Column("Рекламация", Visible = false, IsBadge = true)]
 		public bool IsClaim { get; set; }
 
 		[JsonPropertyName("is_only_paid")]
-		[Column("Оплачен, не запущен", Visible = false)]
+		[Column("Оплачен, не запущен", Visible = false, IsBadge = true)]
 		public bool IsOnlyPaid { get; set; }
 
 		[JsonPropertyName("production_order_id")]

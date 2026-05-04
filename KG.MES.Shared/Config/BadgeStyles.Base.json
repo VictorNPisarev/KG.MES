@@ -13,7 +13,7 @@
 	"booleans":
 	{
 		"True": "bg-success",
-		"False": "bg-secondary"
+		"False": "bg-light text-dark"
 	},
 	"defaultStatus": "bg-light text-dark",
 	"defaultBoolean": "bg-light text-dark"

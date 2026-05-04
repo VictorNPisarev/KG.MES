@@ -344,5 +344,27 @@ namespace KG.MES.Shared.Services
 				return false;
 			}
 		}
+
+		/// <summary>
+		/// Запрос к API для получекния подробной информации для конкретного заказа
+		/// с указание Api endpoint
+		/// </summary>
+		/// <typeparam name="T"></typeparam>
+		/// <param name="endpoint"></param>
+		/// <param name="id"></param>
+		/// <returns></returns>
+		public async Task<T?> GetOrderByIdAsync<T>(string endpoint, Guid id)
+		{
+			try
+			{
+				var url = $"{BaseUrl}/{endpoint}/{id}";
+				return await _httpClient.GetFromJsonAsync<T>(url);
+			}
+			catch (Exception ex)
+			{
+				_logger.LogError(ex, "Error fetching order {Id}", id);
+				return default;
+			}
+		}
 	}
 }
