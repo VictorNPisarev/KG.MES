@@ -19,9 +19,7 @@ namespace KG.MES.Shared.Helpers
 				{
 					PropertyName = x.Property.Name,
 					Title = x.Attr!.Title,
-					Visible = x.Attr.Visible,
 					Format = x.Attr.DisplayFormat,
-					Order = x.Attr.Order,
 					IsBadge = x.Attr.IsBadge
 				})
 				.ToList();
@@ -45,6 +43,32 @@ namespace KG.MES.Shared.Helpers
 			}
 
 			return value.ToString();
+		}
+
+		public static List<ColumnSetting> GetDefaultSettings<T>()
+		{
+			var settings = typeof(T).GetProperties()
+				.Select(p => new
+				{
+					Property = p,
+					Attr = p.GetCustomAttribute<ColumnAttribute>()
+				})
+				.Where(x => x.Attr != null)
+				.Select(x => new ColumnSetting
+				{
+					PropertyName = x.Property.Name,
+					Visible = x.Attr!.Visible,
+					Order = x.Attr.Order,
+					Width = 0
+				})
+				.ToList();
+
+			// Перенумеровываем подряд, начиная с 0
+			var ordered = settings.OrderBy(s => s.Order).ToList();
+			for (int i = 0; i < ordered.Count; i++)
+				ordered[i].Order = i;
+
+			return settings;
 		}
 	}
 }

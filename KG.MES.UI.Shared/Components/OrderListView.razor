@@ -1,14 +1,14 @@
 @typeparam TOrder
 @using Microsoft.AspNetCore.Components.Web
+@using Microsoft.JSInterop
 @using KG.MES.Shared.Models.Dto
 @using KG.MES.Shared.Services
-@using System.Reflection
 @using KG.MES.Shared.Helpers
 
 @inject ProductionApiService ApiService
+@inject IJSRuntime JSRuntime
 
-
-<PageTitle>Заказы в производстве</PageTitle>
+<PageTitle>@Title</PageTitle>
 
 <div class="container-fluid py-4">
 	<!-- Sticky заголовок -->
@@ -17,10 +17,10 @@
 			<div class="row align-items-center">
 				<div class="col">
 					<h1 class="display-6 mb-1">
-						<i class="bi bi-clipboard-check"></i>  @Title
+						<i class="bi bi-clipboard-check"></i> @Title
 					</h1>
 				</div>
-				@if(ShowActions)
+				@if (ShowActions)
 				{
 					<div class="col-auto">
 						@HeaderActions
@@ -42,27 +42,13 @@
 			</select>
 		</div>
 		<div class="col-md-2">
-			<input class="form-control" 
-				type="text" 
-				placeholder="Номер заказа" 
-				@bind="searchNumber"
-				@onkeyup="OnSearchKeyUp" />
+			<input class="form-control"
+				   type="text"
+				   placeholder="Номер заказа"
+				   @bind="searchNumber"
+				   @onkeyup="OnSearchKeyUp" />
 		</div>
 		<div class="col-md-2">
-			<select class="form-select" @bind="sortBy">
-				<option value="ready_date">По дате готовности</option>
-				<option value="order_number">По номеру заказа</option>
-				<option value="current_status">По статусу</option>
-				<option value="window_count">По количеству окон</option>
-			</select>
-		</div>
-		<div class="col-md-1">
-			<select class="form-select" @bind="sortOrder">
-				<option value="asc">↑</option>
-				<option value="desc">↓</option>
-			</select>
-		</div>
-		<div class="col-md-1">
 			<select class="form-select" @bind="pageSize" @bind:after="OnPageSizeChanged">
 				<option value="20">20</option>
 				<option value="50">50</option>
@@ -75,6 +61,70 @@
 			</button>
 		</div>
 	</div>
+
+	<!-- Панель над таблицей -->
+	<div class="d-flex justify-content-between align-items-center mt-3 mb-2">
+		<div class="text-muted">
+			@if (orders.Data.Any())
+			{
+				<span>Показано @((orders.Page - 1) * orders.Limit + 1)-@(Math.Min(orders.Page * orders.Limit, orders.Total)) из @orders.Total</span>
+			}
+		</div>
+			<div class="d-flex gap-2">
+				<!-- Колонки -->
+				<div class="position-relative">
+					<button class="btn btn-sm btn-outline-secondary"
+							@onclick="() => isColumnsOpen = !isColumnsOpen"
+							type="button">
+						<i class="bi bi-gear"></i> Колонки
+						<i class="bi @(isColumnsOpen ? "bi-chevron-up" : "bi-chevron-down") ms-1 small"></i>
+					</button>
+
+					@if (isColumnsOpen)
+					{
+						<div class="dropdown-menu dropdown-menu-end show p-3"
+							style="min-width: 300px; position: absolute; right: 0; z-index: 1000;">
+							<h6 class="dropdown-header">Настройка колонок</h6>
+							@foreach (var setting in columnSettings.OrderBy(s => s.Order))
+							{
+								var info = columnInfos.FirstOrDefault(i => i.PropertyName == setting.PropertyName);
+								var title = info?.Title ?? setting.PropertyName;
+								<div class="d-flex align-items-center py-1">
+									<div class="form-check mb-0">
+										<input type="checkbox"
+											class="form-check-input"
+											id="col-@setting.PropertyName"
+											checked="@setting.Visible"
+											@onchange="(e) => ToggleColumn(setting.PropertyName, (bool)(e.Value ?? false))" />
+										<label class="form-check-label" for="col-@setting.PropertyName">
+											@title
+										</label>
+										<button class="btn btn-sm btn-link p-0"
+												@onclick="() => MoveColumn(setting.PropertyName, -1)" disabled="@(setting.Order <= 0)">
+											<i class="bi bi-chevron-up small"></i>
+										</button>
+										<button class="btn btn-sm btn-link p-0"
+												@onclick="() => MoveColumn(setting.PropertyName, 1)">
+											<i class="bi bi-chevron-down small"></i>
+										</button>
+									</div>
+								</div>
+							}
+							<hr />
+							<button class="btn btn-sm btn-outline-primary w-100" @onclick="() => { ResetColumns(); isColumnsOpen = false; }">
+								<i class="bi bi-arrow-counterclockwise"></i> Сбросить
+							</button>
+						</div>
+
+						<!-- Затемнение для закрытия при клике снаружи -->
+						<div class="position-fixed top-0 start-0 w-100 h-100"
+							style="z-index: 999;"
+							@onclick="() => isColumnsOpen = false"></div>
+					}
+				</div>
+			</div>
+	</div>
+
 	<!-- Таблица -->
 	@if (isLoading)
 	{
@@ -87,48 +137,45 @@
 	}
 	else if (orders.Data.Any())
 	{
+		var visibleData = BuildVisibleColumns();
+
 		<div class="table-responsive mt-3">
 			<table class="table table-hover">
 				<thead class="table-light">
 					<tr>
-						@foreach (var col in columns)
+						@foreach (var col in visibleData)
 						{
-							<th>@col.Title</th>
+							<th style="@(col.Setting.Width > 0 ? $"width: {col.Setting.Width}px;" : "")">
+								@col.Info.Title
+							</th>
 						}
-						<th></th>
+						<th style="width: 40px;"></th>
 					</tr>
 				</thead>
 				<tbody>
 					@foreach (var order in orders.Data)
 					{
 						<tr>
-							@foreach (var col in columns)
+							@foreach (var col in visibleData)
 							{
 								<td>
-									@if (col.IsBadge)
+									@if (col.Info.IsBadge && order != null)
 									{
-										@if (order != null)
-										{
-											var value = order.GetType().GetProperty(col.PropertyName)?.GetValue(order);
-											var text = BadgeHelper.GetFormattedBadgeValue(order, col);
-											var cssClass = BadgeHelper.GetBadgeClass(
-												value?.ToString(), 
-												value is bool);
-											
-											<span class="badge @cssClass">@text</span>
-										}
+										var prop = order.GetType().GetProperty(col.Info.BadgeProperty ?? col.Info.PropertyName);
+										var value = prop?.GetValue(order);
+
+										<span class="badge @BadgeHelper.GetBadgeClass(value?.ToString(), value is bool)">
+											@BadgeHelper.GetFormattedBadgeValue(order, col.Info)
+										</span>
 									}
-									else
+									else if (order != null)
 									{
-										@if (order != null)
-										{
-											@ColumnHelper.GetFormattedValue(order, col)
-										}
+										@ColumnHelper.GetFormattedValue(order, col.Info)
 									}
 								</td>
 							}
 							<td>
-								<button class="btn btn-sm btn-outline-primary" 
+								<button class="btn btn-sm btn-outline-primary"
 										@onclick="() => OnOrderClick.InvokeAsync(order)">
 									<i class="bi bi-eye"></i>
 								</button>
@@ -137,41 +184,41 @@
 					}
 				</tbody>
 			</table>
-
 		</div>
 
 		<!-- Пагинация -->
 		<div class="d-flex justify-content-between align-items-center mt-3">
-			<div class="text-muted">
-				Показано @((orders.Page - 1) * orders.Limit + 1)-@(Math.Min(orders.Page * orders.Limit, orders.Total)) из @orders.Total
-			</div>
 			<nav>
 				<ul class="pagination mb-0">
 					<li class="page-item @(orders.HasPreviousPage ? "" : "disabled")">
-						<button class="page-link" @onclick="() => GoToPage(1)" disabled="@(!orders.HasPreviousPage)">
+						<button class="page-link" @onclick="() => GoToPage(1)"
+								disabled="@(!orders.HasPreviousPage)">
 							<i class="bi bi-chevron-double-left"></i>
 						</button>
 					</li>
 					<li class="page-item @(orders.HasPreviousPage ? "" : "disabled")">
-						<button class="page-link" @onclick="() => GoToPage(orders.Page - 1)" disabled="@(!orders.HasPreviousPage)">
+						<button class="page-link" @onclick="() => GoToPage(orders.Page - 1)"
+								disabled="@(!orders.HasPreviousPage)">
 							<i class="bi bi-chevron-left"></i>
 						</button>
 					</li>
-					
+
 					@foreach (var pageNum in GetPageNumbers())
 					{
 						<li class="page-item @(pageNum == orders.Page ? "active" : "")">
 							<button class="page-link" @onclick="() => GoToPage(pageNum)">@pageNum</button>
 						</li>
 					}
-					
+
 					<li class="page-item @(orders.HasNextPage ? "" : "disabled")">
-						<button class="page-link" @onclick="() => GoToPage(orders.Page + 1)" disabled="@(!orders.HasNextPage)">
+						<button class="page-link" @onclick="() => GoToPage(orders.Page + 1)"
+								disabled="@(!orders.HasNextPage)">
 							<i class="bi bi-chevron-right"></i>
 						</button>
 					</li>
 					<li class="page-item @(orders.HasNextPage ? "" : "disabled")">
-						<button class="page-link" @onclick="() => GoToPage(orders.TotalPages)" disabled="@(!orders.HasNextPage)">
+						<button class="page-link" @onclick="() => GoToPage(orders.TotalPages)"
+								disabled="@(!orders.HasNextPage)">
 							<i class="bi bi-chevron-double-right"></i>
 						</button>
 					</li>
@@ -197,7 +244,8 @@
 
 	private PaginatedResponse<TOrder> orders = new();
 	private List<WorkplaceDto> workplaces = new();
-	private List<ColumnInfo> columns = ColumnHelper.GetColumns<TOrder>().Where(c => c.Visible).ToList();
+	private List<ColumnInfo> columnInfos = new();
+	private List<ColumnSetting> columnSettings = new();
 	private bool isLoading = false;
 	private string searchNumber = "";
 	private int currentPage = 1;
@@ -205,11 +253,91 @@
 	private string sortBy = "ready_date";
 	private string sortOrder = "asc";
 	private Guid? selectedWorkplaceId;
+	private string tableKey => $"{Endpoint}_{typeof(TOrder).Name}";
+	private bool isColumnsOpen = false;
 
 	protected override async Task OnInitializedAsync()
 	{
+		columnInfos = ColumnHelper.GetColumns<TOrder>();
+
+		await LoadSettings();
 		workplaces = await ApiService.GetActiveWorkplacesAsync();
 		await LoadOrders();
+	}
+
+	private async Task LoadSettings()
+	{
+		try
+		{
+			var json = await JSRuntime.InvokeAsync<string>("localStorage.getItem", $"table_settings_{tableKey}");
+			columnSettings = TableSettingsManager.GetSettings<TOrder>(json);
+		}
+		catch
+		{
+			columnSettings = TableSettingsManager.GetDefaultSettings<TOrder>();
+		}
+	}
+
+	private List<(ColumnInfo Info, ColumnSetting Setting)> BuildVisibleColumns()
+	{
+		return columnSettings
+			.Where(s => s.Visible)
+			.Join(columnInfos,
+				  s => s.PropertyName,
+				  i => i.PropertyName,
+				  (s, i) => (Info: i, Setting: s))
+			.OrderBy(x => x.Setting.Order)
+			.ToList();
+	}
+
+	private async Task SaveSettings()
+	{
+		var json = TableSettingsManager.Serialize(columnSettings);
+		await JSRuntime.InvokeVoidAsync("localStorage.setItem", $"table_settings_{tableKey}", json);
+	}
+
+	private async Task ToggleColumn(string propertyName, bool visible)
+	{
+		var setting = columnSettings.FirstOrDefault(s => s.PropertyName == propertyName);
+		if (setting != null)
+		{
+			setting.Visible = visible;
+			await SaveSettings();
+			StateHasChanged();
+		}
+	}
+
+	private async Task MoveColumn(string propertyName, int direction)
+	{
+		var setting = columnSettings.FirstOrDefault(s => s.PropertyName == propertyName);
+		if (setting == null) return;
+
+		var orderedList = columnSettings.OrderBy(s => s.Order).ToList();
+		var currentIndex = orderedList.IndexOf(setting);
+		var newIndex = currentIndex + direction;
+
+		if (newIndex < 0 || newIndex >= orderedList.Count) return;
+
+		// Меняем местами
+		var swap = orderedList[newIndex];
+		var tempOrder = setting.Order;
+		setting.Order = swap.Order;
+		swap.Order = tempOrder;
+
+		// Нормализуем порядок
+		orderedList = columnSettings.OrderBy(s => s.Order).ToList();
+		for (int i = 0; i < orderedList.Count; i++)
+			orderedList[i].Order = i;
+
+		await SaveSettings();
+		StateHasChanged();
+	}
+	
+	private async Task ResetColumns()
+	{
+		columnSettings = TableSettingsManager.GetDefaultSettings<TOrder>();
+		await SaveSettings();
+		StateHasChanged();
 	}
 
 	private async Task LoadOrders()
@@ -228,9 +356,6 @@
 				sortBy: sortBy,
 				sortOrder: sortOrder
 			);
-
-			Console.WriteLine("LoadOrders() -> try");
-
 		}
 		catch (Exception ex)
 		{
@@ -238,7 +363,6 @@
 		}
 		finally
 		{
-			Console.WriteLine($"LoadOrders() -> finally. Orders.count:{orders.Data.Count}");
 			isLoading = false;
 			StateHasChanged();
 		}
@@ -246,12 +370,7 @@
 
 	private async Task ApplyFilters()
 	{
-		currentPage = 1; // Сброс на первую страницу при новых фильтрах
-		await LoadOrders();
-	}
-
-	private async Task RefreshOrders()
-	{
+		currentPage = 1;
 		await LoadOrders();
 	}
 
@@ -270,15 +389,7 @@
 	private async Task OnSearchKeyUp(KeyboardEventArgs e)
 	{
 		if (e.Key == "Enter")
-		{
 			await ApplyFilters();
-		}
-	}
-
-	private void OpenOrder(ProductionOrderDto order)
-	{
-		// TODO: переход на детали заказа
-		Console.WriteLine($"Open order: {order.OrderNumber}");
 	}
 
 	private List<int> GetPageNumbers()
@@ -288,9 +399,7 @@
 		var end = Math.Min(orders.TotalPages, orders.Page + 2);
 
 		for (int i = start; i <= end; i++)
-		{
 			pages.Add(i);
-		}
 
 		return pages;
 	}
