@@ -1,0 +1,74 @@
+@using KG.MES.Shared.Models.Dto
+@using KG.MES.Shared.Services
+
+@inject ProductionApiService ApiService
+
+@if (isLoading)
+{
+	<div class="text-center py-3">
+		<div class="spinner-border spinner-border-sm text-primary" role="status"></div>
+	</div>
+}
+else if (orderSupplies.Any())
+{
+	<div class="table-responsive">
+		<table class="table table-sm mb-0">
+			<thead>
+				<tr class="text-muted small">
+					<th>Материал</th>
+					<th>Количество</th>
+					<th>Статус</th>
+					<th>Ожидаемая дата</th>
+					<th>Примечание</th>
+				</tr>
+			</thead>
+			<tbody>
+				@foreach (var m in orderSupplies)
+				{
+					<tr>
+						<td>
+							<strong>@m.DisplayName</strong>
+							@if (!string.IsNullOrEmpty(m.Comment))
+							{
+								<div><small class="text-muted">@m.Comment</small></div>
+							}
+						</td>
+						<td>@m.QuantityDisplay</td>
+						<td>
+							@if (!string.IsNullOrEmpty(m.StatusDisplay))
+							{
+								<span class="badge" style="background: @(m.StatusColor ?? "#6c757d")">
+									@m.StatusDisplay
+								</span>
+							}
+							else
+							{
+								<span class="text-muted">—</span>
+							}
+						</td>
+						<td>@m.ExpectedDateDisplay</td>
+						<td class="text-muted small">@(m.Comment ?? "—")</td>
+					</tr>
+				}
+			</tbody>
+		</table>
+	</div>
+}
+else
+{
+	<p class="text-muted small mb-0">Нет данных о снабжении</p>
+}
+
+@code {
+	[Parameter] public Guid OrderId { get; set; }
+
+	private List<OrderSupplyDto> orderSupplies = new();
+	private bool isLoading = true;
+
+	protected override async Task OnInitializedAsync()
+	{
+		orderSupplies = await ApiService.GetOrderSuppliesAsync(OrderId);
+		Console.WriteLine("orderSupplies: ${orderSupplies}");
+		isLoading = false;
+	}
+}

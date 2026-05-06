@@ -4,6 +4,7 @@ namespace KG.MES.Shared.Models.Enums
 	{
 		Main,
 		Trace,
-		Notes
+		Notes,
+		Supplies
 	}
 }

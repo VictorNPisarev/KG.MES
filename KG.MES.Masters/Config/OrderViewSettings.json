@@ -6,7 +6,7 @@
 	"canEdit": true,
 	"canExport": false,
 	"canDelete": false,
-	"showTrace": true,
+	"showTrace": false,
 	"additional":
 	{
 		"allowedStatuses":

@@ -69,6 +69,13 @@ else if (order != null)
 								</div>
 							</div>
 							break;
+						case WidgetType.Supplies:
+							<div class="card">
+								<div class="card-body">
+									<OrderSuppliesWidget OrderId="@OrderId" />
+								</div>
+							</div>
+							break;
 					}
 				</div>
 			}
@@ -91,6 +98,9 @@ else if (order != null)
 							break;
 						case WidgetType.Notes:
 							<p class="text-muted mb-0">@GetNotes(order)</p>
+							break;
+						case WidgetType.Supplies:
+							<OrderSuppliesWidget OrderId="@OrderId" />
 							break;
 					}
 				</div>
@@ -149,7 +159,8 @@ else
 		{
 			new() { WidgetId = WidgetType.Main, Title = "Основные данные", Order = 0, Column = 1 },
 			new() { WidgetId = WidgetType.Trace, Title = "История прохождения", Order = 1 },
-			new() { WidgetId = WidgetType.Notes, Title = "Примечания", Order = 2 }
+			new() { WidgetId = WidgetType.Notes, Title = "Примечания", Order = 2 },
+			new() { WidgetId = WidgetType.Supplies, Title = "Снабжение", Order = 3 }
 		}
 	};
 
