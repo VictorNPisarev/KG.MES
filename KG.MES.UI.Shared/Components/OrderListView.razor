@@ -1,4 +1,5 @@
 @typeparam TOrder
+@using KG.MES.Shared.Models.Config
 @using Microsoft.AspNetCore.Components.Web
 @using Microsoft.JSInterop
 @using KG.MES.Shared.Models.Dto
@@ -176,7 +177,7 @@
 							}
 							<td>
 								<button class="btn btn-sm btn-outline-primary"
-										@onclick="() => OnOrderClick.InvokeAsync(order)">
+										@onclick="() => OpenOrder(order)">
 									<i class="bi bi-eye"></i>
 								</button>
 							</td>
@@ -234,14 +235,36 @@
 		</div>
 	}
 </div>
-
-@code {
-	[Parameter] public string Endpoint { get; set; } = "orders";
-	[Parameter] public string Title { get; set; } = "Заказы";
-	[Parameter] public bool ShowActions { get; set; } = true;
+<!-- Модальное окно с карточкой заказа -->
+@if (isModalOpen)
+{
+	<div class="modal fade show" style="display: block;" tabindex="-1">
+		<div class="modal-dialog modal-xl">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title">Заказ №@GetOrderNumber(selectedOrder!)</h5>
+					<button type="button" class="btn-close" @onclick="CloseOrder"></button>
+				</div>
+				<div class="modal-body">
+					<OrderDashboard TOrder="TOrder" 
+									OrderId="@GetOrderId(selectedOrder!)" 
+									Settings="@Settings" />
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="modal-backdrop fade show" @onclick="CloseOrder"></div>
+}
+@code
+{
+	[Parameter] public OrderViewSettings Settings { get; set; } = new();
 	[Parameter] public EventCallback<TOrder> OnOrderClick { get; set; }
 	[Parameter] public RenderFragment? HeaderActions { get; set; }
 
+	private string Endpoint => Settings.ListEndpoint;
+	private string CardEndpoint => Settings.CardEndpoint;
+	private string Title => Settings.Title;
+	private bool ShowActions => Settings.ShowActions;
 	private PaginatedResponse<TOrder> orders = new();
 	private List<WorkplaceDto> workplaces = new();
 	private List<ColumnInfo> columnInfos = new();
@@ -402,5 +425,34 @@
 			pages.Add(i);
 
 		return pages;
+	}
+
+	private TOrder? selectedOrder;
+
+	private bool isModalOpen;
+
+	private void OpenOrder(TOrder order)
+	{
+		selectedOrder = order;
+		isModalOpen = true;
+		StateHasChanged();
+	}
+
+	private void CloseOrder()
+	{
+		isModalOpen = false;
+		selectedOrder = default;
+		StateHasChanged();
+	}
+	private Guid GetOrderId(TOrder order)
+	{
+		var prop = typeof(TOrder).GetProperty("Id");
+		return (Guid)(prop?.GetValue(order) ?? Guid.Empty);
+	}
+
+	private string GetOrderNumber(TOrder order)
+	{
+		var prop = typeof(TOrder).GetProperty("OrderNumber");
+		return prop?.GetValue(order)?.ToString() ?? "—";
 	}
 }

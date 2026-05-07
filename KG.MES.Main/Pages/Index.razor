@@ -1,12 +1,13 @@
 @page "/"
+@using KG.MES.Shared.Models.Config
 @using KG.MES.Shared.Models.Dto
 
-<OrderListView TOrder="ProductionOrderDto" 
-               Endpoint="orders" 
-               Title="Производство">
-    <HeaderActions>
-        <NavLink href="/upload" class="btn btn-primary">
-            <i class="bi bi-upload"></i> Загрузить XML
-        </NavLink>
-    </HeaderActions>
+@inject OrderViewSettings AppSettings
+
+<OrderListView TOrder="ProductionOrderDto" Settings="@AppSettings">
+	<HeaderActions>
+		<NavLink href="/upload" class="btn btn-primary">
+			<i class="bi bi-upload"></i> Загрузить XML
+		</NavLink>
+	</HeaderActions>
 </OrderListView>

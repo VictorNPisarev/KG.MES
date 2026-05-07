@@ -1,3 +1,7 @@
+@import 'orderTraces.css';
+@import 'supplies.css';
+@import 'dashboard.css';
+
 .sticky-header {
 	position: sticky;
 	top: 0;
@@ -300,4 +304,10 @@ span:focus {
 	overflow-y: auto;
 	max-height: calc(100vh - 250px);
 	/* Ограничение по высоте экрана */
+}
+
+.badge-ghost-dark
+{
+	background: rgba(33, 37, 41, 0.1);
+	color: rgba(33, 37, 41, 0.55);
 }

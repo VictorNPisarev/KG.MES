@@ -1,12 +1,15 @@
-using KG.MES.Masters.Components;
 using KG.MES.Shared.Helpers;
 using KG.MES.Shared.Services;
+using KG.MES.Masters.Components;
+using KG.MES.Shared.Models.Config;
+using System.Text.Json;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorComponents().AddInteractiveServerComponents();
 builder.Services.AddHttpClient<ProductionApiService>();
+builder.Services.AddSingleton(LoadViewSettings());
 
 var app = builder.Build();
 
@@ -50,5 +53,23 @@ async Task LoadDataAsync(IServiceProvider services, IWebHostEnvironment env)
 	catch (Exception ex)
 	{
 		logger.LogError(ex, "Failed to load badges config");
+	}
+}
+
+/// Загрузка настроек отображения списка заказов и карточки
+OrderViewSettings LoadViewSettings()
+{
+	var settingsPath = Path.Combine(builder.Environment.ContentRootPath, "Config", "orderViewSettings.json");
+	if (File.Exists(settingsPath))
+	{
+		var json = File.ReadAllText(settingsPath);
+		var appSettings = JsonSerializer.Deserialize<OrderViewSettings>(json,
+			new JsonSerializerOptions { PropertyNameCaseInsensitive = true }) ?? new OrderViewSettings();
+
+		return appSettings;
+	}
+	else
+	{
+		return new OrderViewSettings();
 	}
 }

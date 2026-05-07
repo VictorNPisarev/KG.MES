@@ -1,0 +1,42 @@
+.trace-title
+{
+	margin-bottom: 0.5rem;
+	color: #000000;
+	font-size: 0.9rem;
+}
+
+.trace-panel
+{
+	background: #fffbf3;
+	border-radius: 0.75rem;
+	padding: 0.75rem 1rem;
+	border: 1px solid rgba(0, 0, 0, .06);
+	margin: 0rem;
+	display: inline-block;
+}
+
+.trace-table
+{
+	width: auto;
+	border-collapse: collapse;
+}
+
+.trace-table td
+{
+	padding: 0.5rem 0.5rem;
+	vertical-align: middle;
+}
+
+.trace-table tr+tr td {
+	border-top: 1px solid rgba(0, 0, 0, .05);
+}
+
+.trace-workplace {
+	font-size: 0.85rem;
+	color: #000000;
+	white-space: nowrap;
+}
+
+.trace-status {
+	white-space: nowrap;
+}

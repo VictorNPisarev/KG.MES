@@ -1,0 +1,52 @@
+@using KG.MES.Shared.Models.Dto
+@using KG.MES.Shared.Services
+@using KG.MES.Shared.Helpers
+
+@inject ProductionApiService ApiService
+
+@if (isLoading)
+{
+	<div class="text-center py-3">
+		<div class="spinner-border spinner-border-sm text-primary" role="status"></div>
+	</div>
+}
+else if (orderTrace?.WorkplaceTraces != null && orderTrace.WorkplaceTraces.Any())
+{
+	<div class="trace-panel">
+		<h6 class="trace-title"><i class="bi bi-clock-history"></i> История производства</h6>
+		<div>
+			<table class="trace-table">
+				<tbody>
+					@foreach (var wp in orderTrace.WorkplaceTraces)
+					{
+						<tr>
+							<td class="trace-workplace">@wp.WorkplaceName</td>
+							<td class="trace-status">
+								<span class="badge @BadgeHelper.GetBadgeClass(wp.Status)">
+									@wp.GetStatusText()
+								</span>
+							</td>
+						</tr>
+					}
+				</tbody>
+			</table>
+		</div>
+	</div>
+}
+else
+{
+	<p class="text-muted small mb-0">Нет данных о прохождении заказа</p>
+}
+
+@code {
+	[Parameter] public Guid OrderId { get; set; }
+
+	private OrderTrace? orderTrace;
+	private bool isLoading = true;
+
+	protected override async Task OnInitializedAsync()
+	{
+		orderTrace = await ApiService.GetOrderTraceAsync(OrderId);
+		isLoading = false;
+	}
+}

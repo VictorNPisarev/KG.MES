@@ -1,6 +1,6 @@
 {
 	"extends": "base",
-	"statuses":
+	"workplaces":
 	{
 		"торцовка": "bg-info",
 		"столярка": "bg-warning",

@@ -1,0 +1,138 @@
+@typeparam TOrder
+@using KG.MES.Shared.Models.Config
+@using KG.MES.Shared.Models.Dto
+@using KG.MES.Shared.Helpers
+@using Microsoft.JSInterop
+
+@inject IJSRuntime JSRuntime
+
+<div class="row">
+	@if (isSettingsOpen)
+	{
+		<div class="col-12 mb-3 bg-light rounded p-3">
+			<h6>Настройка полей</h6>
+			@foreach (var setting in fieldSettings.OrderBy(s => s.Order))
+			{
+				var info = fieldInfos.FirstOrDefault(i => i.PropertyName == setting.PropertyName);
+				var title = info?.Title ?? setting.PropertyName;
+				<div class="d-flex align-items-center gap-2 py-1">
+					<button class="btn btn-sm btn-link p-0" @onclick="() => MoveField(setting.PropertyName, -1)">↑</button>
+					<button class="btn btn-sm btn-link p-0" @onclick="() => MoveField(setting.PropertyName, 1)">↓</button>
+					<div class="form-check mb-0">
+						<input type="checkbox" class="form-check-input"
+							   checked="@setting.Visible"
+							   @onchange="(e) => ToggleField(setting.PropertyName, (bool)(e.Value ?? false))" />
+						<label class="form-check-label">@title</label>
+					</div>
+				</div>
+			}
+			<button class="btn btn-sm btn-outline-primary mt-2" @onclick="ResetFields">Сбросить</button>
+		</div>
+	}
+	@foreach (var field in BuildVisibleFields())
+	{
+		<div class="@GetFieldClass(field.Setting.Width)">
+			<label class="text-muted small">@field.Info.Title</label>
+			<div class="fw-bold">
+				@if (field.Info.IsBadge && Order != null)
+				{
+					var value = Order.GetType().GetProperty(field.Info.PropertyName)?.GetValue(Order);
+					<span class="badge @BadgeHelper.GetBadgeClass(value?.ToString(), value is bool)">
+						@BadgeHelper.GetFormattedBadgeValue(Order, field.Info)
+					</span>
+				}
+				else if (Order != null)
+				{
+					@ColumnHelper.GetFormattedValue(Order, field.Info)
+				}
+			</div>
+		</div>
+	}
+</div>
+
+@code {
+	[Parameter] public TOrder? Order { get; set; }
+	[Parameter] public OrderViewSettings Settings { get; set; } = new();
+	[Parameter] public bool ShowSettings { get; set; }
+
+	private List<ColumnInfo> fieldInfos = new();
+	private List<ColumnSetting> fieldSettings = new();
+	private bool isSettingsOpen;
+
+	private string cardKey => $"fields_{typeof(TOrder).Name}";
+
+	protected override async Task OnInitializedAsync()
+	{
+		fieldInfos = ColumnHelper.GetColumns<TOrder>();
+		await LoadSettings();
+		isSettingsOpen = ShowSettings;
+	}
+
+	private async Task LoadSettings()
+	{
+		try
+		{
+			var json = await JSRuntime.InvokeAsync<string>("localStorage.getItem", $"card_settings_{cardKey}");
+			fieldSettings = TableSettingsManager.GetSettings<TOrder>(json);
+		}
+		catch
+		{
+			fieldSettings = TableSettingsManager.GetDefaultSettings<TOrder>();
+		}
+	}
+
+	private List<(ColumnInfo Info, ColumnSetting Setting)> BuildVisibleFields()
+	{
+		return fieldSettings
+			.Where(s => s.Visible)
+			.Join(fieldInfos, s => s.PropertyName, i => i.PropertyName, (s, i) => (Info: i, Setting: s))
+			.OrderBy(x => x.Setting.Order)
+			.ToList();
+	}
+
+	private string GetFieldClass(int width) => width switch
+	{
+		4 => "col-md-4 mb-3",
+		6 => "col-md-6 mb-3",
+		8 => "col-md-8 mb-3",
+		12 => "col-12 mb-3",
+		_ => "col-md-6 mb-3"
+	};
+
+	private async Task ToggleField(string propertyName, bool visible)
+	{
+		var setting = fieldSettings.FirstOrDefault(s => s.PropertyName == propertyName);
+		if (setting != null)
+		{
+			setting.Visible = visible;
+			await SaveSettings();
+			StateHasChanged();
+		}
+	}
+
+	private async Task MoveField(string propertyName, int direction)
+	{
+		var setting = fieldSettings.FirstOrDefault(s => s.PropertyName == propertyName);
+		if (setting == null) return;
+		var ordered = fieldSettings.OrderBy(s => s.Order).ToList();
+		var idx = ordered.IndexOf(setting);
+		var newIdx = idx + direction;
+		if (newIdx < 0 || newIdx >= ordered.Count) return;
+		(ordered[idx].Order, ordered[newIdx].Order) = (ordered[newIdx].Order, ordered[idx].Order);
+		await SaveSettings();
+		StateHasChanged();
+	}
+
+	private async Task ResetFields()
+	{
+		fieldSettings = TableSettingsManager.GetDefaultSettings<TOrder>();
+		await SaveSettings();
+		StateHasChanged();
+	}
+
+	private async Task SaveSettings()
+	{
+		var json = TableSettingsManager.Serialize(fieldSettings);
+		await JSRuntime.InvokeVoidAsync("localStorage.setItem", $"card_settings_{cardKey}", json);
+	}
+}

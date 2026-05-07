@@ -31,9 +31,9 @@ namespace KG.MES.Shared.Helpers
 		{
 			var config = JsonSerializer.Deserialize<BadgeConfig>(json);
 
-			if (config?.Statuses != null)
+			if (config?.Workplaces != null)
 			{
-				foreach (var kvp in config.Statuses)
+				foreach (var kvp in config.Workplaces)
 					_statusStyles[kvp.Key.ToLower()] = kvp.Value;
 			}
 
@@ -71,8 +71,8 @@ namespace KG.MES.Shared.Helpers
 
 		private class BadgeConfig
 		{
-			[JsonPropertyName("statuses")]
-			public Dictionary<string, string> Statuses { get; set; } = new();
+			[JsonPropertyName("workplaces")]
+			public Dictionary<string, string> Workplaces { get; set; } = new();
 
 			[JsonPropertyName("booleans")]
 			public Dictionary<string, string> Booleans { get; set; } = new();

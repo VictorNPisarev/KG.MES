@@ -1,7 +1,8 @@
 ﻿@page "/"
+@using KG.MES.Shared.Models.Config
 @using KG.MES.Shared.Models.Dto
+@inject OrderViewSettings AppSettings
 
-<OrderListView TOrder="MastersProductionOrderDto" 
-			Endpoint="orders" 
-			Title="Производство">
+
+<OrderListView TOrder="MastersProductionOrderDto" Settings="@AppSettings">
 </OrderListView>

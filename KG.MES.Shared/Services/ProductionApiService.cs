@@ -366,5 +366,46 @@ namespace KG.MES.Shared.Services
 				return default;
 			}
 		}
+
+		/// <summary>
+		/// Получение трекинга заказа на производстве
+		/// </summary>
+		/// <param name="orderId"></param>
+		/// <returns></returns>
+		public async Task<OrderTrace?> GetOrderTraceAsync(Guid orderId)
+		{
+			try
+			{
+				var url = $"{BaseUrl}/orders/{orderId}/trace";
+				var response = await _httpClient.GetFromJsonAsync<OrderTraceResponse>(url);
+				return response?.OrderTraces?.FirstOrDefault();
+			}
+			catch (Exception ex)
+			{
+				_logger.LogError(ex, "Error fetching trace for order {Id}", orderId);
+				return null;
+			}
+		}
+
+		/// <summary>
+		/// Получение данных снабжения заказа
+		/// </summary>
+		/// <param name="orderId"></param>
+		/// <returns></returns>
+		public async Task<List<OrderSupplyDto>> GetOrderSuppliesAsync(Guid orderId)
+		{
+			try
+			{
+				var url = $"{BaseUrl}/orders/{orderId}/supplies";
+				return await _httpClient.GetFromJsonAsync<List<OrderSupplyDto>>(url)
+					   ?? new List<OrderSupplyDto>();
+			}
+			catch (Exception ex)
+			{
+				_logger.LogError(ex, "Error fetching materials for order {Id}", orderId);
+				return new List<OrderSupplyDto>();
+			}
+		}
+
 	}
 }

@@ -1,0 +1,57 @@
+@using KG.MES.Shared.Models.Dto
+@using KG.MES.Shared.Services
+@using KG.MES.Shared.Helpers
+
+@inject ProductionApiService ApiService
+
+@if (isLoading)
+{
+	<div class="text-center py-3">
+		<div class="spinner-border spinner-border-sm text-primary" role="status"></div>
+	</div>
+}
+else if (supplies.Any())
+{
+	<div class="supplies-panel">
+		<h6 class="trace-title"><i class="bi bi-clock-history"></i> Отметки снабжения</h6>
+		<table class="supplies-table">
+			<tbody>
+				@foreach (var s in supplies)
+				{
+					<tr>
+						<td class=".supplies-material_type">@s.DisplayName</td>
+						<td class="supplies-status">
+							@if (!string.IsNullOrEmpty(s.StatusCode))
+							{
+								<span class="badge @BadgeHelper.GetBadgeClass(s.StatusCode)">
+									@s.GetStatusCodeDisplayText()
+								</span>
+							}
+							else
+							{
+								<span class="text-muted">—</span>
+							}
+						</td>
+					</tr>
+				}
+			</tbody>
+		</table>
+	</div>
+}
+else
+{
+	<p class="text-muted small mb-0">Нет данных о снабжении</p>
+}
+
+@code {
+	[Parameter] public Guid OrderId { get; set; }
+
+	private List<OrderSupplyDto> supplies = new();
+	private bool isLoading = true;
+
+	protected override async Task OnInitializedAsync()
+	{
+		supplies = await ApiService.GetOrderSuppliesAsync(OrderId);
+		isLoading = false;
+	}
+}

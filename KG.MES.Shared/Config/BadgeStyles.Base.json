@@ -1,5 +1,5 @@
 {
-	"statuses":
+	"workplaces":
 	{
 		"none": "bg-secondary",
 		"торцовка": "bg-warning",
@@ -8,7 +8,16 @@
 		"сборка": "bg-warning",
 		"покраска": "bg-primary",
 		"готово": "bg-success",
-		"отгружен": "bg-dark"
+		"отгружен": "bg-dark",
+		"planned": "badge-ghost-dark",
+		"pending": "bg-warning bg-opacity-25 text-warning",
+		"active": "bg-primary bg-opacity-25 text-primary",
+		"completed": "bg-success bg-opacity-25 text-success",
+		"joinery": "bg-warning bg-opacity-25 text-warning",
+		"not_available": "bg-danger bg-opacity-25 text-danger",
+		"delayed": "bg-warning bg-opacity-25 text-warning",
+		"ordered": "bg-primary bg-opacity-25 text-primary",
+		"in_stock": "bg-success bg-opacity-25 text-success"
 	},
 	"booleans":
 	{
