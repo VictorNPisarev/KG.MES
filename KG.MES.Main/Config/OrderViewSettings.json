@@ -7,8 +7,9 @@
 	"canEdit": true,
 	"canDelete": true,
 	"showTrace": false,
-	"additional":
-	{
+	"showSupply": true,
+	"editSupply": false,
+	"additional": {
 		"defaultSortBy": "ready_date",
 		"defaultSortOrder": "asc"
 	}

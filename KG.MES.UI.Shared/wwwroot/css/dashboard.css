@@ -13,6 +13,7 @@
 	transition: opacity 0.15s, border 0.15s;
 	border: 2px solid transparent;
 	border-radius: 0.5rem;
+	position: relative;
 }
 
 .dashboard-widget.widget-span-2 {
@@ -67,4 +68,21 @@
 	background: #0d6efd;
 	color: white;
 	border-color: #0d6efd;
+}
+
+.dashboard-widget .resize-handle {
+	position: absolute;
+	top: 0;
+	right: 0;
+	width: 6px;
+	height: 100%;
+	cursor: ew-resize;
+	background: transparent;
+	z-index: 10;
+}
+
+.dashboard-widget .resize-handle:hover,
+.dashboard-widget .resize-handle:active {
+	background: rgba(13, 110, 253, 0.2);
+	border-left: 1px solid #0d6efd;
 }

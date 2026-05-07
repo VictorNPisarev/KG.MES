@@ -47,10 +47,20 @@ namespace KG.MES.Shared.Models.Config
 		public bool CanExport { get; set; }
 
 		/// <summary>
-		/// Права на экспорт
+		/// Права на просмотр этапов производства
 		/// </summary>
 		[JsonPropertyName("showTrace")]
-		public bool ShowTrace { get; set; }
+		public bool ShowTrace { get; set; } = true;
+
+		/// <summary>
+		/// Права на видимость отметок снабжения
+		/// </summary>
+		public bool ShowSupply { get; set; } = true;
+		
+		/// <summary>
+		/// Права на изменение отметок снабжения
+		/// </summary>
+		public bool EditSupply { get; set; }
 
 		/// <summary>
 		/// ???

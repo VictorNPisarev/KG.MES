@@ -45,7 +45,8 @@ else if (order != null)
 			{
 				<div class="dashboard-widget @GetWidgetClass(widget)"
 					draggable="true"
-					data-widget-id="@widget.WidgetId">
+					data-widget-id="@widget.WidgetId"
+					style='@(widget.CustomWidth != null ? $"width: {widget.CustomWidth};" : "")''>
 					@switch (widget.WidgetId)
 					{
 						case WidgetType.Main:
@@ -174,17 +175,23 @@ else
 		}
 	}
 
-	private DashboardSettings GetDefaultDashboard() => new()
+	private DashboardSettings GetDefaultDashboard()
 	{
-		Widgets = new List<WidgetSettings>
+		var widgets = new List<WidgetSettings>
 		{
-			new() { WidgetId = WidgetType.Main, Title = "Основные данные", Order = 0, Column = 1 },
-			new() { WidgetId = WidgetType.Trace, Title = "История прохождения", Order = 1 },
-			new() { WidgetId = WidgetType.Notes, Title = "Примечания", Order = 2 },
-			new() { WidgetId = WidgetType.Supplies, Title = "Снабжение", Order = 3 }
-		}
-	};
+			new() { WidgetId = WidgetType.Main, Title = "Основные данные", Order = 0 },
+			new() { WidgetId = WidgetType.Notes, Title = "Примечания", Order = 1 }
+		};
 
+		if (Settings.ShowTrace)
+			widgets.Add(new() { WidgetId = WidgetType.Trace, Title = "История прохождения", Order = widgets.Count });
+
+		if (Settings.ShowSupply)
+			widgets.Add(new() { WidgetId = WidgetType.Supplies, Title = "Снабжение", Order = widgets.Count });
+
+		return new DashboardSettings { Widgets = widgets };
+	}
+	
 	private async Task SaveDashboard()
 	{
 		var json = JsonSerializer.Serialize(dashboardSettings);
@@ -367,5 +374,17 @@ else
 
 		await SaveDashboard();
 		StateHasChanged();
+	}
+
+	[JSInvokable]
+	public async Task OnWidgetResize(string widgetId, string width)
+	{
+		var widget = dashboardSettings.Widgets.FirstOrDefault(w => w.WidgetId.ToString() == widgetId);
+		if (widget != null)
+		{
+			widget.CustomWidth = width;
+			await SaveDashboard();
+			StateHasChanged();
+		}
 	}
 }

@@ -1,0 +1,7 @@
+{
+	"statuses": {
+		"in_stock": "bg-success",
+		"ordered": "bg-warning",
+		"missing": "bg-danger"
+	}
+}

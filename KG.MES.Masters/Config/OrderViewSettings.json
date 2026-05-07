@@ -4,16 +4,7 @@
 	"title": "Заказы (Мастера)",
 	"showActions": false,
 	"canEdit": true,
-	"canExport": false,
-	"canDelete": false,
-	"showTrace": false,
-	"additional":
-	{
-		"allowedStatuses":
-		[
-			"торцовка",
-			"столярка",
-			"покраска"
-		]
-	}
+	"showTrace": true,
+	"showSupply": true,
+	"editSupply": false
 }

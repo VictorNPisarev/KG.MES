@@ -1,0 +1,7 @@
+﻿@page "/"
+@using KG.MES.Shared.Models.Config
+@using KG.MES.Shared.Models.Dto
+
+@inject OrderViewSettings AppSettings
+
+<OrderListView TOrder="ProductionOrderDto" Settings="@AppSettings" />

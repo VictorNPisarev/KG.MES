@@ -117,6 +117,43 @@ window.dashboardDragDrop =
 				}
 			}
 		});
+
+		document.querySelectorAll('.dashboard-widget').forEach(widget =>
+		{
+			widget.addEventListener('mousedown', function (e)
+			{
+				const rect = widget.getBoundingClientRect();
+				const isRightEdge = e.clientX > rect.right - 10;
+
+				if (isRightEdge)
+				{
+					e.preventDefault();
+					e.stopPropagation();
+
+					const startX = e.clientX;
+					const startWidth = rect.width;
+
+					function onMouseMove(me)
+					{
+						const newWidth = startWidth + (me.clientX - startX);
+						widget.style.width = Math.max(200, newWidth) + 'px';
+						widget.style.gridColumn = 'auto';
+					}
+
+					function onMouseUp()
+					{
+						document.removeEventListener('mousemove', onMouseMove);
+						document.removeEventListener('mouseup', onMouseUp);
+						// Сохранить ширину
+						const widgetId = widget.dataset.widgetId;
+						dotnetHelper.invokeMethodAsync('OnWidgetResize', widgetId, widget.style.width);
+					}
+
+					document.addEventListener('mousemove', onMouseMove);
+					document.addEventListener('mouseup', onMouseUp);
+				}
+			});
+		});
 	},
 
 	getDraggedId: function ()
