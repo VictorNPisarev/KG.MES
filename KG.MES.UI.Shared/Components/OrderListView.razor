@@ -243,17 +243,19 @@
 			<div class="modal-content">
 				<div class="modal-header">
 					<h5 class="modal-title">Заказ №@GetOrderNumber(selectedOrder!)</h5>
-					<button type="button" class="btn-close" @onclick="CloseOrder"></button>
+					<button type="button" class="btn-close" @onclick="() => dashboardRef!.CloseOrder()"></button>
 				</div>
 				<div class="modal-body">
-					<OrderDashboard TOrder="TOrder" 
+					<OrderDashboard @ref="dashboardRef"
+									TOrder="TOrder" 
 									OrderId="@GetOrderId(selectedOrder!)" 
-									Settings="@Settings" />
+									Settings="@Settings"
+									OnClose="CloseOrder" />
 				</div>
 			</div>
 		</div>
 	</div>
-	<div class="modal-backdrop fade show" @onclick="CloseOrder"></div>
+	<div class="modal-backdrop fade show" @onclick="() => dashboardRef!.CloseOrder()"></div>
 }
 @code
 {
@@ -261,6 +263,7 @@
 	[Parameter] public EventCallback<TOrder> OnOrderClick { get; set; }
 	[Parameter] public RenderFragment? HeaderActions { get; set; }
 
+	private OrderDashboard<TOrder>? dashboardRef;
 	private string Endpoint => Settings.ListEndpoint;
 	private string CardEndpoint => Settings.CardEndpoint;
 	private string Title => Settings.Title;
