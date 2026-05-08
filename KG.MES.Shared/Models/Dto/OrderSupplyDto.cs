@@ -20,16 +20,5 @@ namespace KG.MES.Shared.Models.Dto
 		[JsonPropertyName("comment")]
 		public string? Comment { get; set; }
 
-		// Справочные данные (заполняются извне)
-		[JsonIgnore] public SupplyType? SupplyType { get; private set; }
-		[JsonIgnore] public SupplyCondition? SupplyCondition { get; private set; }
-		//[JsonIgnore] public string? ConditionBadge { get; private set; }
-
-		public void Enrich(List<SupplyType> types, List<SupplyCondition> conditions)
-		{
-			SupplyType = types.FirstOrDefault(t => t.Id == SupplyTypeId);
-			SupplyCondition = conditions.FirstOrDefault(c => c.Id == SupplyConditionId);
-		}
-
 	}
 }

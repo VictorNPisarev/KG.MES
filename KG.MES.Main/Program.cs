@@ -25,7 +25,6 @@ builder.Services.AddSingleton<IMaterialFactory, MaterialFactory>();
 builder.Services.AddScoped<IDocumentItemFactory, DocumentItemFactory>();
 builder.Services.AddSingleton(LoadViewSettings());
 builder.Services.AddSingleton<SupplyService>();
-builder.Services.AddSingleton<OrderSupplyDtoFactory>();
 
 
 var app = builder.Build();
