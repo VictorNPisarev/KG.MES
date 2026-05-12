@@ -5,6 +5,9 @@ namespace KG.MES.Shared.Models.Dto
 {
 	public class OrderSupplyDto
 	{
+		[JsonPropertyName("order_supply_id")]
+		public string OrderSupplyId { get; set; } = string.Empty;
+
 		[JsonPropertyName("supply_type_id")]
 		public string SupplyTypeId { get; set; } = string.Empty;
 
