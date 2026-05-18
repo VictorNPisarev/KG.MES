@@ -68,10 +68,10 @@ else if (order != null)
 								</div>
 							</div>
 							break;
-						case WidgetType.Notes:
+						case WidgetType.Comments:
 							<div class="card">
 								<div class="card-body">
-									<p class="text-muted mb-0">@GetNotes(order)</p>
+									<OrderCommentsWidget @ref="commentsWidget" OrderId="@OrderId" />
 								</div>
 							</div>
 							break;
@@ -98,8 +98,8 @@ else if (order != null)
 						case WidgetType.Supplies:
 							<OrderSuppliesWidget @ref="suppliesWidget" OrderId="@OrderId" CanEdit="@Settings.EditSupply" />
 							break;
-						case WidgetType.Notes:
-							<p class="text-muted mb-0">@GetNotes(order)</p>
+						case WidgetType.Comments:
+							<OrderCommentsWidget @ref="commentsWidget" OrderId="@OrderId" />
 							break;
 					}
 				</div>

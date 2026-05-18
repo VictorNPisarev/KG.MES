@@ -1,6 +1,7 @@
 @import 'orderTraces.css';
 @import 'supplies.css';
 @import 'dashboard.css';
+@import 'comments.css';
 
 .sticky-header {
 	position: sticky;

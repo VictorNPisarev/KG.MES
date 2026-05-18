@@ -7,6 +7,8 @@ namespace KG.MES.Shared.Helpers
 	{
 		private static Dictionary<string, string> _statusStyles = new();
 		private static Dictionary<string, string> _booleanStyles = new();
+		private static Dictionary<string, string> _statusDisplayNames = new();
+
 		private static string _defaultStatus = "bg-light text-dark";
 		private static string _defaultBoolean = "bg-light text-dark";
 
@@ -44,6 +46,18 @@ namespace KG.MES.Shared.Helpers
 			}
 		}
 
+		public static void RegisterStatusDisplayName(string code, string displayName)
+		{
+			_statusDisplayNames[code] = displayName;
+		}
+
+		public static string GetStatusDisplayName(string? code)
+		{
+			if (code == null) return "—";
+			return _statusDisplayNames.TryGetValue(code, out var name) ? name : code;
+		}
+
+
 		public static string GetBadgeClass(string? value, bool isBoolean = false)
 		{
 			if (string.IsNullOrEmpty(value))
@@ -60,10 +74,12 @@ namespace KG.MES.Shared.Helpers
 			var propertyName = column.BadgeProperty ?? column.PropertyName;
 			var property = obj.GetType().GetProperty(propertyName);
 			var value = property?.GetValue(obj);
+			//Console.WriteLine($"propertyName: {propertyName}; value: {value}");
 
 			return value switch
 			{
 				bool b => b ? "Да" : "Нет",
+				string s => GetStatusDisplayName(s),
 				null => "—",
 				_ => value.ToString() ?? "—"
 			};

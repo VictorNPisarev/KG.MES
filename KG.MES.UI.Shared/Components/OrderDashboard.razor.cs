@@ -28,6 +28,7 @@ public partial class OrderDashboard<TOrder> : ComponentBase
 	private OrderSuppliesWidget? suppliesWidget;
 	private OrderTraceWidget? traceWidget;
 	private OrderFieldsWidget<TOrder>? fieldsWidget;
+	private OrderCommentsWidget? commentsWidget;
 
 	private List<WidgetSettings> visibleWidgets => dashboardSettings.Widgets
 		.Where(w => w.Visible)
@@ -35,9 +36,6 @@ public partial class OrderDashboard<TOrder> : ComponentBase
 		.ToList();
 
 	private string dashboardKey => $"dashboard_{typeof(TOrder).Name}";
-
-	private List<ISavableWidget> savableWidgets = [];
-
 
 	protected override async Task OnInitializedAsync()
 	{
@@ -89,7 +87,7 @@ public partial class OrderDashboard<TOrder> : ComponentBase
 		var widgets = new List<WidgetSettings>
 		{
 			new() { WidgetId = WidgetType.Main, Title = "Основные данные", Order = 0 },
-			new() { WidgetId = WidgetType.Notes, Title = "Примечания", Order = 1 }
+			new() { WidgetId = WidgetType.Comments, Title = "Примечания", Order = 1 }
 		};
 
 		if (Settings.ShowTrace)
@@ -161,14 +159,6 @@ public partial class OrderDashboard<TOrder> : ComponentBase
 			dotnetRef = DotNetObjectReference.Create(this);
 			await JSRuntime.InvokeVoidAsync("dashboardDragDrop.init", dotnetRef);
 		}
-
-		// Собираем все ISavableWidget со страницы
-		savableWidgets.Clear();
-
-		if (fieldsWidget != null) savableWidgets.Add(fieldsWidget);
-		if (traceWidget != null) savableWidgets.Add(traceWidget);
-		if (suppliesWidget != null) savableWidgets.Add(suppliesWidget);
-
 	}
 
 	[JSInvokable]
@@ -308,8 +298,6 @@ public partial class OrderDashboard<TOrder> : ComponentBase
 	public async Task CloseOrder()
 	{
 		Console.WriteLine("=== CloseOrder called ===");
-		Console.WriteLine($"suppliesWidget is null: {suppliesWidget == null}");
-		Console.WriteLine($"fieldsWidget is null: {fieldsWidget == null}");
 
 		var widgets = new ISavableWidget[] { fieldsWidget!, traceWidget!, suppliesWidget! };
 		var hasChanges = widgets.Any(w => w?.HasUnsavedChanges() == true);
