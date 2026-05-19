@@ -5,44 +5,40 @@ namespace KG.MES.Shared.Helpers
 {
 	public static class BadgeHelper
 	{
-		private static Dictionary<string, string> _statusStyles = new();
-		private static Dictionary<string, string> _booleanStyles = new();
+		private static Dictionary<string, Dictionary<string, string>> _badgeStyles = new();
+		private static Dictionary<string, string> _defaultStyles = new();
 		private static Dictionary<string, string> _statusDisplayNames = new();
-
-		private static string _defaultStatus = "bg-light text-dark";
-		private static string _defaultBoolean = "bg-light text-dark";
 
 		public static void LoadConfig(string baseConfigPath, string? appConfigPath = null)
 		{
-			// Загружаем базовый
 			if (File.Exists(baseConfigPath))
-			{
-				var baseJson = File.ReadAllText(baseConfigPath);
-				MergeConfig(baseJson);
-			}
+				MergeConfig(File.ReadAllText(baseConfigPath));
 
-			// Поверх накладываем специфичный для приложения
 			if (!string.IsNullOrEmpty(appConfigPath) && File.Exists(appConfigPath))
-			{
-				var appJson = File.ReadAllText(appConfigPath);
-				MergeConfig(appJson);
-			}
+				MergeConfig(File.ReadAllText(appConfigPath));
 		}
 
 		private static void MergeConfig(string json)
 		{
-			var config = JsonSerializer.Deserialize<BadgeConfig>(json);
+			var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+			var config = JsonSerializer.Deserialize<BadgeConfig>(json, options);
 
-			if (config?.Workplaces != null)
+			if (config?.Groups != null)
 			{
-				foreach (var kvp in config.Workplaces)
-					_statusStyles[kvp.Key.ToLower()] = kvp.Value;
+				foreach (var (groupName, styles) in config.Groups)
+				{
+					if (!_badgeStyles.ContainsKey(groupName))
+						_badgeStyles[groupName] = new Dictionary<string, string>();
+
+					foreach (var kvp in styles)
+						_badgeStyles[groupName][kvp.Key.ToLower()] = kvp.Value;
+				}
 			}
 
-			if (config?.Booleans != null)
+			if (config?.Defaults != null)
 			{
-				foreach (var kvp in config.Booleans)
-					_booleanStyles[kvp.Key] = kvp.Value;
+				foreach (var kvp in config.Defaults)
+					_defaultStyles[kvp.Key] = kvp.Value;
 			}
 		}
 
@@ -57,16 +53,26 @@ namespace KG.MES.Shared.Helpers
 			return _statusDisplayNames.TryGetValue(code, out var name) ? name : code;
 		}
 
-
-		public static string GetBadgeClass(string? value, bool isBoolean = false)
+		public static string GetBadgeClass(string? value, string? group = null)
 		{
 			if (string.IsNullOrEmpty(value))
-				return isBoolean ? _defaultBoolean : _defaultStatus;
+				return _defaultStyles.GetValueOrDefault(group ?? "order_status", "bg-light text-dark");
 
-			if (isBoolean)
-				return _booleanStyles.GetValueOrDefault(value, _defaultBoolean);
+			// Ищем в указанной группе
+			if (group != null && _badgeStyles.TryGetValue(group, out var groupStyles))
+			{
+				if (groupStyles.TryGetValue(value.ToLower(), out var cls))
+					return cls;
+			}
 
-			return _statusStyles.GetValueOrDefault(value.ToLower(), _defaultStatus);
+			// Ищем по всем группам
+			foreach (var g in _badgeStyles.Values)
+			{
+				if (g.TryGetValue(value.ToLower(), out var cls))
+					return cls;
+			}
+
+			return _defaultStyles.GetValueOrDefault(group ?? "order_status", "bg-light text-dark");
 		}
 
 		public static string GetFormattedBadgeValue(object obj, ColumnInfo column)
@@ -74,7 +80,6 @@ namespace KG.MES.Shared.Helpers
 			var propertyName = column.BadgeProperty ?? column.PropertyName;
 			var property = obj.GetType().GetProperty(propertyName);
 			var value = property?.GetValue(obj);
-			//Console.WriteLine($"propertyName: {propertyName}; value: {value}");
 
 			return value switch
 			{
@@ -87,17 +92,11 @@ namespace KG.MES.Shared.Helpers
 
 		private class BadgeConfig
 		{
-			[JsonPropertyName("workplaces")]
-			public Dictionary<string, string> Workplaces { get; set; } = new();
+			[JsonPropertyName("groups")]
+			public Dictionary<string, Dictionary<string, string>> Groups { get; set; } = new();
 
-			[JsonPropertyName("booleans")]
-			public Dictionary<string, string> Booleans { get; set; } = new();
-
-			[JsonPropertyName("defaultStatus")]
-			public string DefaultStatus { get; set; } = "bg-light text-dark";
-
-			[JsonPropertyName("defaultBoolean")]
-			public string DefaultBoolean { get; set; } = "bg-light text-dark";
+			[JsonPropertyName("defaults")]
+			public Dictionary<string, string> Defaults { get; set; } = new();
 		}
 	}
 }

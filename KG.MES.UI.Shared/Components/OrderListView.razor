@@ -157,7 +157,7 @@
 										var prop = order.GetType().GetProperty(col.Info.BadgeProperty ?? col.Info.PropertyName);
 										var value = prop?.GetValue(order);
 
-										<span class="badge @BadgeHelper.GetBadgeClass(value?.ToString(), value is bool)">
+										<span class="badge @BadgeHelper.GetBadgeClass(value?.ToString())">
 											@BadgeHelper.GetFormattedBadgeValue(order, col.Info)
 										</span>
 									}

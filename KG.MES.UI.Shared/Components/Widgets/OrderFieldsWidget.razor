@@ -35,7 +35,7 @@
 				@if (field.Info.IsBadge && Order != null)
 				{
 					var value = Order.GetType().GetProperty(field.Info.PropertyName)?.GetValue(Order);
-					<span class="badge @BadgeHelper.GetBadgeClass(value?.ToString(), value is bool)">
+					<span class="badge @BadgeHelper.GetBadgeClass(value?.ToString())">
 						@BadgeHelper.GetFormattedBadgeValue(Order, field.Info)
 					</span>
 				}

@@ -20,7 +20,8 @@ namespace KG.MES.Shared.Helpers
 					PropertyName = x.Property.Name,
 					Title = x.Attr!.Title,
 					Format = x.Attr.DisplayFormat,
-					IsBadge = x.Attr.IsBadge
+					IsBadge = x.Attr.IsBadge,
+					BadgeGroup = x.Attr.BadgeGroup
 				})
 				.ToList();
 		}
