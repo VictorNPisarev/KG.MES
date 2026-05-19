@@ -1,0 +1,144 @@
+<PageTitle>Статистика рабочих мест</PageTitle>
+
+<div class="container-fluid py-4">
+	<h1 class="display-6 mb-4">
+		<i class="bi bi-bar-chart"></i> Статистика рабочих мест
+	</h1>
+
+	<div class="row g-3">
+		<div class="col-md-3">
+			<div class="card">
+				<div class="card-header">
+					<h6 class="mb-0">Участки</h6>
+				</div>
+				<div class="list-group list-group-flush">
+					@foreach (var wp in workplaces)
+					{
+						<button class="list-group-item list-group-item-action @(wp.Id == selectedWorkplaceId ? "active" : "")"
+								@onclick="() => SelectWorkplace(wp.Id)">
+							@wp.Name
+						</button>
+					}
+				</div>
+			</div>
+		</div>
+
+		<div class="col-md-9">
+			@if (selectedWorkplaceId != null && stats != null)
+			{
+				<div class="row g-2 mb-4">
+					<div class="col-3">
+						<div class="stat-card bg-warning bg-opacity-10">
+							<div class="stat-number">@(stats.PendingCount + stats.JoineryCount)</div>
+							<div class="stat-label">Ожидают</div>
+						</div>
+					</div>
+					<!--<div class="col-3">
+						<div class="stat-card bg-info bg-opacity-10">
+							<div class="stat-number">@stats.JoineryCount</div>
+							<div class="stat-label">Ожидают со столярки</div>
+						</div>
+					</div>-->
+					<div class="col-3">
+						<div class="stat-card bg-primary bg-opacity-10">
+							<div class="stat-number">@stats.ActiveCount</div>
+							<div class="stat-label">В работе</div>
+						</div>
+					</div>
+					<div class="col-3">
+						<div class="stat-card bg-success bg-opacity-10">
+							<div class="stat-number">@stats.CompletedCount</div>
+							<div class="stat-label">Завершено</div>
+						</div>
+					</div>
+				</div>
+
+				<div class="card mb-3">
+					<div class="card-header">
+						<h6 class="mb-0">Заблокированные заказы</h6>
+					</div>
+					<div class="card-body p-0">
+						@if (blocks.Any())
+						{
+							<table class="table table-sm mb-0">
+								<thead>
+									<tr>
+										<th>Заказ</th>
+										<th>Причина</th>
+										<th>Дата</th>
+										<th>Сотрудник</th>
+									</tr>
+								</thead>
+								<tbody>
+									@foreach (var b in blocks)
+									{
+										<tr>
+											<td>@b.OrderNumber</td>
+											<td>@b.Reason</td>
+											<td>@b.BlockedAt.ToString("dd.MM HH:mm")</td>
+											<td>@b.UserName</td>
+										</tr>
+									}
+								</tbody>
+							</table>
+						}
+						else
+						{
+							<p class="text-muted small p-3">Нет заблокированных заказов</p>
+						}
+					</div>
+				</div>
+
+				<div class="card">
+					<div class="card-header">
+						<h6 class="mb-0">Последние операции (7 дней)</h6>
+					</div>
+					<div class="card-body p-0">
+						@if (history.Any())
+						{
+							<table class="table table-sm mb-0">
+								<thead>
+									<tr>
+										<th>Тип</th>
+										<th>Заказ</th>
+										<th>Сотрудник</th>
+										<th>Время</th>
+										<th>Примечание</th>
+									</tr>
+								</thead>
+								<tbody>
+									@foreach (var h in history)
+									{
+										<tr>
+											<td>
+												<span class="badge @(h.OperationType switch { "COMPLETE" => "bg-success", "START" => "bg-primary", _ => "bg-secondary" })">
+													@(h.OperationType switch { "COMPLETE" => "Завершено", "START" => "Начато", _ => h.OperationType })
+												</span>
+											</td>
+											<td>@h.OrderNumber</td>
+											<td>@h.UserName</td>
+											<td>@h.OperationTime.ToString("dd.MM HH:mm")</td>
+											<td>@h.Notes</td>
+										</tr>
+									}
+								</tbody>
+							</table>
+						}
+						else
+						{
+							<p class="text-muted small p-3">Нет операций</p>
+						}
+					</div>
+				</div>
+			}
+			else
+			{
+				<div class="text-center py-5 text-muted">
+					<i class="bi bi-arrow-left display-4"></i>
+					<p>Выберите участок для просмотра статистики</p>
+				</div>
+			}
+		</div>
+	</div>
+</div>
+

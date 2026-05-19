@@ -129,10 +129,10 @@ namespace KG.MES.Shared.Services
 				var endpoint = "orders/all";
 
 				var queryParams = new List<string>
-			{
-				$"page={page}",
-				$"limit={limit}"
-			};
+				{
+					$"page={page}",
+					$"limit={limit}"
+				};
 
 				if (!string.IsNullOrEmpty(sortBy))
 					queryParams.Add($"sortBy={Uri.EscapeDataString(sortBy)}");
@@ -587,6 +587,77 @@ namespace KG.MES.Shared.Services
 			{
 				_logger.LogError(ex, "Error deleting comment {CommentId}", commentId);
 				return false;
+			}
+		}
+
+		public async Task<List<WorkplaceDto>> GetWorkplacesAsync(string? type = null)
+		{
+			try
+			{
+				var url = $"{BaseUrl}/workplaces";
+				if (!string.IsNullOrEmpty(type))
+					url += $"?type={type}";
+
+				_logger.LogInformation("GetWorkplacesAsync: {url}", url);
+
+				return await _httpClient.GetFromJsonAsync<List<WorkplaceDto>>(url) ?? [];
+			}
+			catch (Exception ex)
+			{
+				_logger.LogError(ex, "Error fetching workplaces");
+				return [];
+			}
+		}
+
+		public async Task<WorkplaceStatsDto?> GetWorkplaceStatsAsync(Guid workplaceId)
+		{
+			try
+			{
+				var url = $"{BaseUrl}/workplaces/{workplaceId}/stats";
+
+				_logger.LogInformation("GetWorkplaceStatsAsync: {url}", url);
+
+				return await _httpClient.GetFromJsonAsync<WorkplaceStatsDto>(url);
+			}
+			catch (Exception ex)
+			{
+				_logger.LogError(ex, "Error fetching stats for workplace {Id}", workplaceId);
+				return null;
+			}
+		}
+
+		public async Task<List<BlockedOrderDto>> GetWorkplaceBlocksAsync(Guid workplaceId)
+		{
+			try
+			{
+				var url = $"{BaseUrl}/workplaces/{workplaceId}/blocks";
+
+				_logger.LogInformation("GetWorkplaceBlocksAsync: {url}", url);
+
+				return await _httpClient.GetFromJsonAsync<List<BlockedOrderDto>>(url) ?? [];
+			}
+			catch (Exception ex)
+			{
+				_logger.LogError(ex, "Error fetching blocks for workplace {Id}", workplaceId);
+				return [];
+			}
+		}
+
+		public async Task<List<WorkplaceHistoryDto>> GetWorkplaceHistoryAsync(
+			Guid workplaceId, DateTime from, DateTime to, int limit = 10)
+		{
+			try
+			{
+				var url = $"{BaseUrl}/workplaces/{workplaceId}/history?from={from:yyyy-MM-dd}&to={to:yyyy-MM-dd}&limit={limit}";
+
+				_logger.LogInformation("GetWorkplaceHistoryAsync: {url}", url);
+
+				return await _httpClient.GetFromJsonAsync<List<WorkplaceHistoryDto>>(url) ?? [];
+			}
+			catch (Exception ex)
+			{
+				_logger.LogError(ex, "Error fetching history for workplace {Id}", workplaceId);
+				return [];
 			}
 		}
 	}

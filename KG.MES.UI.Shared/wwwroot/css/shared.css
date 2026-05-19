@@ -2,6 +2,7 @@
 @import 'supplies.css';
 @import 'dashboard.css';
 @import 'comments.css';
+@import 'stats.css';
 
 .sticky-header {
 	position: sticky;
