@@ -4,6 +4,7 @@ using KG.MES.Main.Models;
 using KG.MES.Main.Models.Xml;
 using KG.MES.Main.Services;
 using KG.MES.Shared.Helpers;
+using KG.MES.Shared.Interfaces;
 using KG.MES.Shared.Models.Config;
 using KG.MES.Shared.Services;
 
@@ -25,6 +26,7 @@ builder.Services.AddSingleton<IMaterialFactory, MaterialFactory>();
 builder.Services.AddScoped<IDocumentItemFactory, DocumentItemFactory>();
 builder.Services.AddSingleton(LoadViewSettings());
 builder.Services.AddSingleton<SupplyService>();
+builder.Services.AddSingleton<IEventAggregator, EventAggregator>();
 
 
 var app = builder.Build();

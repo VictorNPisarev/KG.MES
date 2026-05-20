@@ -188,6 +188,11 @@ h1:focus, h2:focus, h3:focus, h4:focus, h5:focus, h6:focus, p:focus, div:focus, 
 	outline: none;
 }
 
+#blazor-error-ui
+{
+	display: none !important;
+}
+
 /* === Градиент для иконки === */
 .icon-double-paint-warm
 {

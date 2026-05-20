@@ -21,7 +21,7 @@ else
 				{
 					<div class="comment-item @(c.IsEditing ? "editing" : "")">
 						<div class="comment-header">
-							<span class="comment-date">@c.CreatedAt.ToString("dd.MM.yyyy HH:mm")</span>
+							<span class="comment-date">@c.CreatedAt?.ToString("dd.MM.yyyy HH:mm")</span>
 							@if (!string.IsNullOrEmpty(c.UserName))
 							{
 								<span class="comment-user ms-2">— @c.UserName</span>

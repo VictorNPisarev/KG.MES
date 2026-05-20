@@ -11,6 +11,8 @@ public class OrderSupply
 	public string? SupplyConditionId { get; private set; }
 	public string? Comment { get; set; }
 
+	public Guid? CommentId { get; set; }
+
 	// Справочные данные (заполняются извне)
 	public SupplyType? SupplyType { get; private set; }
 	public SupplyCondition? SupplyCondition { get; private set; }
@@ -22,6 +24,7 @@ public class OrderSupply
 		SupplyTypeId = dto.SupplyTypeId;
 		SupplyConditionId = dto.SupplyConditionId;
 		Comment = dto.Comment;
+		CommentId = dto.CommentId;
 		Enrich();
 	}
 
