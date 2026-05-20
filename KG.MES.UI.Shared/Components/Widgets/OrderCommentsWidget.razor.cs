@@ -1,3 +1,5 @@
+using KG.MES.Shared.Events;
+using KG.MES.Shared.Interfaces;
 using KG.MES.Shared.Models.Dto;
 using KG.MES.Shared.Services;
 using KG.MES.UI.Shared.Interfaces;
@@ -6,13 +8,13 @@ using Microsoft.JSInterop;
 
 namespace KG.MES.UI.Shared.Components.Widgets;
 
-public partial class OrderCommentsWidget : ComponentBase, ISavableWidget
+public partial class OrderCommentsWidget : ComponentBase, ISavableWidget, IDisposable
 {
 	[Parameter] public Guid OrderId { get; set; }
 
 	[Inject] ProductionApiService ApiService { get; set; } = null!;
 	[Inject] IJSRuntime JSRuntime { get; set; } = null!;
-
+	[Inject] private IEventAggregator EventAggregator { get; set; } = null!;
 
 	private List<OrderCommentDto> comments = new();
 	private List<OrderCommentDto> originalComments = new();
@@ -20,6 +22,7 @@ public partial class OrderCommentsWidget : ComponentBase, ISavableWidget
 
 	protected override async Task OnInitializedAsync()
 	{
+		EventAggregator.Subscribe<OrderCommentUpdatedEvent>(OnOrderCommentUpdated);
 		await LoadComments();
 	}
 
@@ -66,6 +69,14 @@ public partial class OrderCommentsWidget : ComponentBase, ISavableWidget
 		{
 			// Перезагружаем комментарии, чтобы получить реальный ID и данные
 			await LoadComments();
+
+			// Публикую событие
+			EventAggregator.Publish(new OrderCommentUpdatedEvent
+			{
+				OrderId = OrderId,
+				Source = "supply"
+			});
+
 		}
 	}
 
@@ -128,5 +139,19 @@ public partial class OrderCommentsWidget : ComponentBase, ISavableWidget
 				await SaveComment(c);
 			}
 		}
+	}
+
+	private async void OnOrderCommentUpdated(OrderCommentUpdatedEvent eventData)
+	{
+		if (eventData.OrderId == OrderId)
+		{
+			await LoadComments(); // перезагружаем комментарии
+			await InvokeAsync(StateHasChanged);
+		}
+	}
+
+	public void Dispose()
+	{
+		EventAggregator.Unsubscribe<OrderCommentUpdatedEvent>(OnOrderCommentUpdated);
 	}
 }

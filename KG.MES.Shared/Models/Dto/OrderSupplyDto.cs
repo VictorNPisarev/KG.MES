@@ -20,6 +20,9 @@ namespace KG.MES.Shared.Models.Dto
 		[JsonPropertyName("quantity")]
 		public double? Quantity { get; set; }
 
+		[JsonPropertyName("comment_id")]
+		public Guid? CommentId { get; set; }
+
 		[JsonPropertyName("comment")]
 		public string? Comment { get; set; }
 

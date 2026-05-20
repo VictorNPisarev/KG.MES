@@ -8,20 +8,33 @@
 			"столярка": "bg-warning",
 			"профилирование": "bg-warning",
 			"сборка": "bg-warning",
+			"шлифовка": "bg-warning",
 			"покраска": "bg-primary",
+			"фурнитура": "bg-warning",
+			"остекление": "bg-warning",
+			"упаковка": "bg-warning",
 			"готово": "bg-success",
-			"отгружен": "bg-dark",
+			"отгружен": "bg-dark"
+		},
+		"workplace_statuses":
+		{
 			"planned": "badge-ghost-dark",
 			"pending": "bg-warning bg-opacity-25 text-warning",
 			"active": "bg-primary bg-opacity-25 text-primary",
 			"completed": "bg-success bg-opacity-25 text-success",
-			"joinery": "bg-warning bg-opacity-25 text-warning",
+			"joinery": "bg-warning bg-opacity-25 text-warning"
+		},
+		"workplace_logs":
+		{
+			"COMPLETE": "bg-success bg-opacity-25 text-success",
+			"START": "bg-primary bg-opacity-25 text-primary"
+		},
+		"supply_statuses":
+		{
 			"not_available": "bg-danger bg-opacity-25 text-danger",
 			"delayed": "bg-warning bg-opacity-25 text-warning",
 			"ordered": "bg-primary bg-opacity-25 text-primary",
-			"in_stock": "bg-success bg-opacity-25 text-success",
-			"COMPLETE": "bg-success bg-opacity-25 text-success",
-			"START":"bg-primary bg-opacity-25 text-primary"
+			"in_stock": "bg-success bg-opacity-25 text-success"
 		},
 		"booleans":
 		{

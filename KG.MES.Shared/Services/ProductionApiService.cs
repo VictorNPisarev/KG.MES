@@ -413,9 +413,10 @@ namespace KG.MES.Shared.Services
 		{
 			try
 			{
+				var url = $"{BaseUrl}/orders/{orderId}/supplies";
+				Console.WriteLine($"UpdateOrderSuppliesAsync url: {url}");
 				var body = new { supplies };
-				var response = await _httpClient.PutAsJsonAsync(
-					$"{BaseUrl}/orders/{orderId}/supplies", body);
+				var response = await _httpClient.PutAsJsonAsync(url, body);
 				return response.IsSuccessStatusCode;
 			}
 			catch (Exception ex)

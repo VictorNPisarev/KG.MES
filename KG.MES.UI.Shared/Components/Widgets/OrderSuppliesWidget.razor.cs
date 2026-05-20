@@ -2,6 +2,9 @@ using Microsoft.AspNetCore.Components;
 using KG.MES.Shared.Models.Dto;
 using KG.MES.Shared.Services;
 using KG.MES.UI.Shared.Interfaces;
+using KG.MES.Shared.Interfaces;
+using KG.MES.Shared.Events;
+using Microsoft.Extensions.Logging;
 
 namespace KG.MES.UI.Shared.Components.Widgets;
 
@@ -12,29 +15,40 @@ public partial class OrderSuppliesWidget : ComponentBase, ISavableWidget
 
 	[Inject] private ProductionApiService ApiService { get; set; } = null!;
 	[Inject] private SupplyService SupplyService { get; set; } = null!;
+	[Inject] private IEventAggregator EventAggregator { get; set; } = null!;
 
-	private List<OrderSupply> supplies = new();
-	private List<OrderSupply> originalSupplies = new();
-	private List<OrderSupply> backup = new();
-	private List<SupplyCondition> conditions = new();
-	private List<SupplyType> types = new();
+	private List<OrderSupply> supplies = [];
+	private List<OrderSupply> originalSupplies = [];
+	private List<OrderSupply> backup = [];
+	private List<SupplyCondition> conditions = [];
+	private List<SupplyType> types = [];
 
 	private bool isLoading = true;
 	private bool EditMode;
-	private Dictionary<string, bool> showComments = new();
-	private Dictionary<string, string> originalComments = new();
-	private Dictionary<string, bool> openDropdowns = new();
+	private Dictionary<string, bool> showComments = [];
+	private Dictionary<string, string> originalComments = [];
+	private Dictionary<string, bool> openDropdowns = [];
 
 	protected override async Task OnInitializedAsync()
 	{
+		//Подписываюсь на изменение комментария
+		EventAggregator.Subscribe<OrderCommentUpdatedEvent>(OnOrderCommentUpdated);
+
 		conditions = await SupplyService.GetConditionsAsync();
 		types = await SupplyService.GetTypesAsync();
 
+		await LoadSupplies();
+
+		isLoading = false;
+	}
+
+	private async Task LoadSupplies()
+	{
 		var supplyDtos = await ApiService.GetOrderSuppliesAsync(OrderId);
 		originalSupplies = supplyDtos.Select(s => new OrderSupply(s, SupplyService)).ToList();
 		supplies = supplyDtos.Select(s => new OrderSupply(s, SupplyService)).ToList();
 
-		isLoading = false;
+		StateHasChanged();
 	}
 
 	private void EnterEditMode()
@@ -156,31 +170,61 @@ public partial class OrderSuppliesWidget : ComponentBase, ISavableWidget
 			var supplyDtos = await ApiService.GetOrderSuppliesAsync(OrderId);
 			originalSupplies = supplyDtos.Select(s => new OrderSupply(s, SupplyService)).ToList(); 
 			supplies = supplyDtos.Select(s => new OrderSupply(s, SupplyService)).ToList();
+
+			// Публикую событие
+			EventAggregator.Publish(new OrderCommentUpdatedEvent
+			{
+				OrderId = OrderId,
+				Source = "supply"
+			});
 		}
 	}
 
 	private async Task SaveComment(OrderSupply supply)
 	{
 		var original = originalSupplies.FirstOrDefault(o => o.SupplyTypeId == supply.SupplyTypeId);
+		var success = false;
 
-		if (supply.Comment != original?.Comment)
-		{
-			var success = await ApiService.UpdateOrderSuppliesAsync(OrderId, new List<object>
-		{
-			new
-			{
-				supplyTypeId = supply.SupplyTypeId,
-				supplyConditionId = supply.SupplyConditionId,
-				comment = supply.Comment
-			}
-		});
+		Console.WriteLine($"original?.Comment: {original?.Comment}");
 
-			if (success)
+		if (original == null)
+		{
+			Console.WriteLine("original == null");
+			success = await ApiService.UpdateOrderSuppliesAsync(OrderId,
+			[
+				new
+				{
+					supplyTypeId = supply.SupplyTypeId,
+					supplyConditionId = supply.SupplyConditionId,
+					comment = supply.Comment
+				}
+			]);
+		}
+		else if (supply.Comment != original?.Comment && supply.CommentId != null)
+		{
+			Console.WriteLine("supply.Comment != original?.Comment && supply.CommentId != null");
+			success = await ApiService.UpdateCommentAsync(OrderId,
+			new OrderCommentDto
 			{
-				// Обновляем оригинал
-				if (original != null)
-					original.Comment = supply.Comment;
+				Id = supply.CommentId ?? new Guid(),
+				Content = supply.Comment
 			}
+			);
+		}
+
+		Console.WriteLine($"success: {success}");
+
+		if (success)
+		{
+			// Обновляю оригинал
+			original?.Comment = supply.Comment;
+
+			// Публикую событие
+			EventAggregator.Publish(new OrderCommentUpdatedEvent
+			{
+				OrderId = OrderId,
+				Source = "supply"
+			});
 		}
 
 		showComments.Remove(supply.SupplyTypeId);
@@ -258,4 +302,22 @@ public partial class OrderSuppliesWidget : ComponentBase, ISavableWidget
 		openDropdowns.Clear();
 		backup.Clear();
 	}
+
+	private async void OnOrderCommentUpdated(OrderCommentUpdatedEvent eventData)
+	{
+		if (eventData.OrderId == OrderId)
+		{
+			Console.WriteLine();
+			Console.WriteLine("eventData.OrderId == OrderId");
+			Console.WriteLine();
+
+			await LoadSupplies();
+			await InvokeAsync(StateHasChanged);
+		}
+	}
+	public void Dispose()
+	{
+		EventAggregator.Unsubscribe<OrderCommentUpdatedEvent>(OnOrderCommentUpdated);
+	}
+
 }
