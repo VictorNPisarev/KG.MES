@@ -22,7 +22,7 @@ namespace KG.MES.Shared.Helpers
 					Format = x.Attr.DisplayFormat,
 					IsBadge = x.Attr.IsBadge,
 					BadgeGroup = x.Attr.BadgeGroup,
-					CommentFlagField = x.Attr.CommentFlagField
+					CommentField = x.Attr.CommentField
 				})
 				.ToList();
 		}

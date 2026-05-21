@@ -168,13 +168,14 @@
 											@ColumnHelper.GetFormattedValue(order, col.Info)
 										}
 										
-										@if (!string.IsNullOrEmpty(col.Info.CommentFlagField))
+										@if (!string.IsNullOrEmpty(col.Info.CommentField))
 										{
-											var hasComment = order.GetType().GetProperty(col.Info.CommentFlagField)?.GetValue(order) as bool? == true;
-											
-											if (hasComment)
+											var comment = order.GetType().GetProperty(col.Info.CommentField)?.GetValue(order)?.ToString();
+											if (!string.IsNullOrEmpty(comment))
 											{
-												<i class="bi bi-chat-left-text text-primary ms-1 small" title="Есть комментарий"></i>
+												<i class="bi bi-chat-left-text text-primary ms-1 small" 
+												title="@comment" 
+												style="cursor: help;"></i>
 											}
 										}
 									}

@@ -105,15 +105,6 @@ public partial class OrderSuppliesWidget : ComponentBase, ISavableWidget
 		{
 			await SaveChanges();
 		}
-		else
-		{
-			foreach (var kvp in showComments.ToList())
-			{
-				var supply = supplies.FirstOrDefault(s => s.SupplyTypeId == kvp.Key);
-				if (supply != null)
-					await SaveComment(supply);
-			}
-		}
 	}
 
 	private async Task SaveChanges()
@@ -230,65 +221,15 @@ public partial class OrderSuppliesWidget : ComponentBase, ISavableWidget
 		showComments.Remove(supply.SupplyTypeId);
 	}
 
-	//public bool HasUnsavedChanges()
-	//{
-	//	foreach (var s in supplies)
-	//	{
-	//		var original = originalSupplies.FirstOrDefault(o => o.SupplyTypeId == s.SupplyTypeId);
-	//		if (original == null) continue;
-
-	//		// Статус изменился
-	//		if (s.SupplyConditionId != original.SupplyConditionId) return true;
-
-	//		// Комментарий в объекте изменился (даже если поле ввода открыто и ещё не сохранено в объект)
-	//		if (showComments.GetValueOrDefault(s.SupplyTypeId))
-	//		{
-	//			// Комментарий открыт — сравниваем с оригиналом
-	//			if (s.Comment != original.Comment) return true;
-	//		}
-	//		else if (s.Comment != original.Comment) return true;
-	//	}
-
-	//	return false;
-	//}
-
-
 	public bool HasUnsavedChanges()
 	{
-		Console.WriteLine("=== SuppliesWidget.HasUnsavedChanges ===");
-		Console.WriteLine($"EditMode: {EditMode}");
-		Console.WriteLine($"showComments: {string.Join(", ", showComments.Keys)}");
+		if (!EditMode) return false;
 
 		foreach (var s in supplies)
 		{
-			var orig = originalSupplies.FirstOrDefault(o => o.SupplyTypeId == s.SupplyTypeId);
-			Console.WriteLine($"  {s.SupplyTypeId}:");
-			Console.WriteLine($"    condition: {s.SupplyConditionId} (orig: {orig?.SupplyConditionId}) = {s.SupplyConditionId != orig?.SupplyConditionId}");
-			Console.WriteLine($"    comment: '{s.Comment}' (orig: '{orig?.Comment}') = {s.Comment != orig?.Comment}");
-		}
-
-		foreach (var kvp in showComments)
-		{
-			var supply = supplies.FirstOrDefault(s => s.SupplyTypeId == kvp.Key);
-			if (supply == null) continue;
-			Console.WriteLine($"  open comment {kvp.Key}: '{supply.Comment}' vs original '{originalComments.GetValueOrDefault(kvp.Key)}'");
-		}
-
-		foreach (var s in supplies)
-		{
-			var original = originalSupplies.FirstOrDefault(o => o.SupplyTypeId == s.SupplyTypeId);
+			var original = backup.FirstOrDefault(b => b.SupplyTypeId == s.SupplyTypeId);
 			if (original == null) continue;
-
-			// Статус изменился
-			if (s.SupplyConditionId != original.SupplyConditionId) return true;
-
-			// Комментарий в объекте изменился (даже если поле ввода открыто и ещё не сохранено в объект)
-			if (showComments.GetValueOrDefault(s.SupplyTypeId))
-			{
-				// Комментарий открыт — сравниваем с оригиналом
-				if (s.Comment != original.Comment) return true;
-			}
-			else if (s.Comment != original.Comment) return true;
+			if (s.SupplyConditionId != original.SupplyConditionId || s.Comment != original.Comment) return true;
 		}
 
 		return false;

@@ -18,38 +18,38 @@ namespace KG.MES.Shared.Models.Dto
 		public DateTime? ReadyDate { get; set; }
 
 		[JsonPropertyName("lumber")]
-		[Column("Пиломатериалы", Order = 2, IsBadge = true, CommentFlagField = "LumberHasComment")]
+		[Column("Пиломатериалы", Order = 2, IsBadge = true, CommentField = "LumberComment")]
 		public string? Lumber { get; set; }
 
-		[JsonPropertyName("lumber_has_comment")]
-		public bool? LumberHasComment { get; set; }
+		[JsonPropertyName("lumber_comment")]
+		public string? LumberComment { get; set; }
 
 		[JsonPropertyName("paint")]
-		[Column("ЛКМ", Order = 3, IsBadge = true, CommentFlagField = "PaintHasComment")]
+		[Column("ЛКМ", Order = 3, IsBadge = true, CommentField = "PaintComment")]
 		public string? Paint { get; set; }
 
-		[JsonPropertyName("paint_has_comment")]
-		public bool? PaintHasComment { get; set; }
+		[JsonPropertyName("paint_comment")]
+		public string? PaintComment { get; set; }
 
 		[JsonPropertyName("glass")]
-		[Column("Стекло", Order = 4, IsBadge = true, CommentFlagField = "GlassHasComment")]
+		[Column("Стекло", Order = 4, IsBadge = true, CommentField = "GlassComment")]
 		public string? Glass { get; set; }
 
-		[JsonPropertyName("glass_has_comment")]
-		public bool? GlassHasComment { get; set; }
+		[JsonPropertyName("glass_comment")]
+		public string? GlassComment { get; set; }
 
 		[JsonPropertyName("furniture")]
-		[Column("Фурнитура", Order = 5, IsBadge = true, CommentFlagField = "FurnitureHasComment")]
+		[Column("Фурнитура", Order = 5, IsBadge = true, CommentField = "FurnitureComment")]
 		public string? Furniture { get; set; }
 
-		[JsonPropertyName("furniture_has_comment")]
-		public bool? FurnitureHasComment { get; set; }
+		[JsonPropertyName("furniture_comment")]
+		public string? FurnitureComment { get; set; }
 
 		[JsonPropertyName("alumwatershield")]
-		[Column("ППС, В/О", Order = 6, IsBadge = true, CommentFlagField = "AlumWaterShieldHasComment")]
+		[Column("ППС, В/О", Order = 6, IsBadge = true, CommentField = "AlumWaterShieldComment")]
 		public string? AlumWaterShield { get; set; }
 
-		[JsonPropertyName("alumWaterShield_has_comment")]
-		public bool? AlumWaterShieldHasComment { get; set; }
+		[JsonPropertyName("alumWaterShield_comment")]
+		public string? AlumWaterShieldComment { get; set; }
 	}
 }
