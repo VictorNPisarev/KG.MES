@@ -93,7 +93,7 @@ else if (order != null)
 							<OrderFieldsWidget @ref="fieldsWidget" TOrder="TOrder" Order="@order" Settings="@Settings" />
 							break;
 						case WidgetType.Trace:
-							<OrderTraceWidget @ref="traceWidget" OrderId="@OrderId" />
+							<OrderTraceWidget @ref="traceWidget" OrderId="@OrderId"  CanEdit="@Settings.EditTrace" />
 							break;
 						case WidgetType.Supplies:
 							<OrderSuppliesWidget @ref="suppliesWidget" OrderId="@OrderId" CanEdit="@Settings.EditSupply" />

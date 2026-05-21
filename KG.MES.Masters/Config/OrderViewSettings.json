@@ -5,6 +5,7 @@
 	"showActions": false,
 	"canEdit": true,
 	"showTrace": true,
+	"editTrace": true,
 	"showSupply": true,
 	"editSupply": false
 }

@@ -7,6 +7,7 @@
 	"canEdit": true,
 	"canDelete": true,
 	"showTrace": true,
+	"editTrace": false,
 	"showSupply": true,
 	"editSupply": false,
 	"additional": {

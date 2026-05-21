@@ -53,13 +53,21 @@ namespace KG.MES.Shared.Models.Config
 		public bool ShowTrace { get; set; } = true;
 
 		/// <summary>
+		/// Права на изменение этапов производства
+		/// </summary>
+		[JsonPropertyName("editTrace")]
+		public bool EditTrace { get; set; }
+
+		/// <summary>
 		/// Права на видимость отметок снабжения
 		/// </summary>
+		[JsonPropertyName("showSupply")]
 		public bool ShowSupply { get; set; } = true;
-		
+
 		/// <summary>
 		/// Права на изменение отметок снабжения
 		/// </summary>
+		[JsonPropertyName("editSupply")]
 		public bool EditSupply { get; set; }
 
 		/// <summary>

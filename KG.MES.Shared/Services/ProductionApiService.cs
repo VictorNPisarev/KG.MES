@@ -661,5 +661,21 @@ namespace KG.MES.Shared.Services
 				return [];
 			}
 		}
+
+		public async Task<bool> UpdateOrderTraceAsync<T>(Guid orderId, List<T> updates)
+		{
+			try
+			{
+				var body = new { workplaces = updates };
+				var response = await _httpClient.PutAsJsonAsync(
+					$"{BaseUrl}/orders/{orderId}/trace", body);
+				return response.IsSuccessStatusCode;
+			}
+			catch (Exception ex)
+			{
+				_logger.LogError(ex, "Error updating trace for order {Id}", orderId);
+				return false;
+			}
+		}
 	}
 }

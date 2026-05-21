@@ -4,7 +4,8 @@
 	"title": "Снабжение",
 	"showActions": false,
 	"canEdit": true,
-	"editSupply": true,
 	"showTrace": false,
+	"editTrace": false,
+	"editSupply": true,
 	"showSupply": true
 }
