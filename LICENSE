@@ -1,0 +1,40 @@
+# Proprietary License
+
+Copyright (c) 2025 Виктор Писарев
+
+All rights reserved.
+
+## License Terms
+
+This software ("KG.MES.Server") is the proprietary information of Viktor Pisarev.
+
+### Permitted Use
+
+- The client may use this software for internal business purposes only.
+- The client may deploy this software on their production servers.
+- The client may create backups for operational security.
+
+### Prohibited Use
+
+- Redistribution of this software to any third party.
+- Modification and distribution of modified versions.
+- Removal or alteration of copyright notices.
+- Use of this software by any other organization without explicit written permission.
+
+### Source Code Access
+
+- Source code is provided for review and auditing purposes.
+- The client does not have the right to publish or share the source code.
+- The client's developers may access the code for debugging and integration, but may not reuse it in other projects.
+
+### Liability
+
+This software is provided "AS IS", without warranty of any kind.
+
+### Termination
+
+Any violation of these terms immediately terminates the license to use this software.
+
+### Contact
+
+For licensing inquiries: [ваш email]
