@@ -41,21 +41,35 @@ partial class Program
 
 	private static string? GetConnectionString(WebApplicationBuilder builder)
 	{
-		builder.Configuration
-			.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-			.AddEnvironmentVariables();
+		// Загружаем .env файл
+		var envFile = Path.Combine(Directory.GetCurrentDirectory(), ".env");
+		var envVars = new Dictionary<string, string>();
 
-		string? connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-
-		if (connectionString is not null)
+		if (File.Exists(envFile))
 		{
-			connectionString = ConnectionStringRegex().Replace(connectionString, match =>
+			foreach (var line in File.ReadAllLines(envFile))
 			{
-				string variable = match.Groups[1].Value;
-				return Environment.GetEnvironmentVariable(variable) ?? match.Value;
-			});
+				if (string.IsNullOrWhiteSpace(line) || line.StartsWith("#"))
+					continue;
+
+				var parts = line.Split('=', 2);
+				if (parts.Length == 2)
+				{
+					envVars[parts[0].Trim()] = parts[1].Trim();
+				}
+			}
 		}
 
+		// Собираем строку подключения напрямую
+		var host = envVars.GetValueOrDefault("DB_HOST", "localhost");
+		var port = envVars.GetValueOrDefault("DB_PORT", "5432");
+		var database = envVars.GetValueOrDefault("DB_NAME", "WorkshopMES");
+		var username = envVars.GetValueOrDefault("DB_USER", "postgres");
+		var password = envVars.GetValueOrDefault("DB_PASSWORD", "");
+
+		var connectionString = $"Host={host};Port={port};Database={database};Username={username};Password={password}";
+
+		Console.WriteLine($"connectionString: {connectionString}");
 		return connectionString;
 	}
 }

@@ -17,5 +17,5 @@ public class OrderBlock
 	public ProductionOrder? ProductionOrder { get; set; }
 	public Workplace? Workplace { get; set; }
 	public User? User { get; set; }
-	public User? ResolvedByUser { get; set; }
+	//public User? ResolvedByUser { get; set; }
 }
