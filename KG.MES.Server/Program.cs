@@ -1,11 +1,32 @@
+using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
 using KG.MES.Server.Data;
+using KG.MES.Server.Hubs;
+using KG.MES.Server.Services;
+using KG.MES.Server.Services.Interfaces;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Добавляем контроллеры
-builder.Services.AddControllers();
+// Регистрируем DbContext
+var connectionString = GetConnectionString(builder);
+builder.Services.AddDbContext<AppDbContext>(options =>
+	options.UseNpgsql(connectionString));
+
+// Регистрация API сервисов
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IOrderService, OrderService>();
+builder.Services.AddScoped<ISupplyService, SupplyService>();
+builder.Services.AddScoped<IWorkplaceService, WorkplaceService>();
+
+// Добавляем контроллеры с настройкой JSON (игнорировать циклы)
+builder.Services.AddControllers()
+	.AddJsonOptions(options =>
+	{
+		options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+		options.JsonSerializerOptions.WriteIndented = true;
+	});
 
 // Добавляем SignalR
 builder.Services.AddSignalR();
@@ -14,10 +35,16 @@ builder.Services.AddSignalR();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-// Регистрируем DbContext
-var connectionString = GetConnectionString(builder);
-builder.Services.AddDbContext<AppDbContext>(options =>
-	options.UseNpgsql(connectionString));
+// Настройка CORS для доступа с любых устройств
+builder.Services.AddCors(options =>
+{
+	options.AddPolicy("AllowAll", policy =>
+	{
+		policy.AllowAnyOrigin()
+			  .AllowAnyMethod()
+			  .AllowAnyHeader();
+	});
+});
 
 var app = builder.Build();
 
@@ -30,6 +57,15 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseAuthorization();
+
+app.UseCors("AllowAll");
+
+app.MapHub<NotificationHub>("/notificationHub");
+
+// Инициализация NotificationHelper (после app.Build())
+var hubContext = app.Services.GetRequiredService<IHubContext<NotificationHub>>();
+NotificationHelper.Initialize(hubContext);
+
 app.MapControllers();
 
 app.Run();
@@ -41,21 +77,35 @@ partial class Program
 
 	private static string? GetConnectionString(WebApplicationBuilder builder)
 	{
-		builder.Configuration
-			.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-			.AddEnvironmentVariables();
+		// Загружаем .env файл
+		var envFile = Path.Combine(Directory.GetCurrentDirectory(), ".env");
+		var envVars = new Dictionary<string, string>();
 
-		string? connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-
-		if (connectionString is not null)
+		if (File.Exists(envFile))
 		{
-			connectionString = ConnectionStringRegex().Replace(connectionString, match =>
+			foreach (var line in File.ReadAllLines(envFile))
 			{
-				string variable = match.Groups[1].Value;
-				return Environment.GetEnvironmentVariable(variable) ?? match.Value;
-			});
+				if (string.IsNullOrWhiteSpace(line) || line.StartsWith("#"))
+					continue;
+
+				var parts = line.Split('=', 2);
+				if (parts.Length == 2)
+				{
+					envVars[parts[0].Trim()] = parts[1].Trim();
+				}
+			}
 		}
 
+		// Собираем строку подключения напрямую
+		var host = envVars.GetValueOrDefault("DB_HOST", "localhost");
+		var port = envVars.GetValueOrDefault("DB_PORT", "5432");
+		var database = envVars.GetValueOrDefault("DB_NAME", "KgMes");
+		var username = envVars.GetValueOrDefault("DB_USER", "postgres");
+		var password = envVars.GetValueOrDefault("DB_PASSWORD", "");
+
+		var connectionString = $"Host={host};Port={port};Database={database};Username={username};Password={password}";
+
+		Console.WriteLine($"connectionString: {connectionString}");
 		return connectionString;
 	}
 }
