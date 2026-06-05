@@ -64,7 +64,7 @@ public partial class OrderCommentsWidget : ComponentBase, ISavableWidget, IDispo
 	private async Task SaveComment(OrderCommentDto comment)
 	{
 		Console.WriteLine($"SaveComment OrderId: {OrderId}");
-		var success = await ApiService.SaveSupplyCommentAsync(OrderId, comment);
+		var success = await ApiService.SaveCommentAsync(OrderId, comment);//SaveSupplyCommentAsync(OrderId, comment);
 		if (success)
 		{
 			// Перезагружаем комментарии, чтобы получить реальный ID и данные
