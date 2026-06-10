@@ -1,29 +1,13 @@
 using System.Text.Json.Serialization;
 
 namespace KG.MES.Shared.Models.Dto;
-
-public class WorkplaceDto
+public class BlockedOrderDto
 {
 	[JsonPropertyName("id")]
-	public Guid Id { get; set; }
-
-	[JsonPropertyName("name")]
-	public string Name { get; set; } = string.Empty;
-
-	[JsonPropertyName("is_workplace")]
-	public bool IsWorkplace { get; set; }
-
-	[JsonPropertyName("level")]
-	public int Level { get; set; }
-}
-
-public class WorkplaceBlockDto
-{
-	[JsonPropertyName("id")]
-	public Guid Id { get; set; }
+	public string Id { get; set; } = string.Empty;
 
 	[JsonPropertyName("production_order_id")]
-	public Guid ProductionOrderId { get; set; }
+	public string ProductionOrderId { get; set; } = string.Empty;
 
 	[JsonPropertyName("order_number")]
 	public string OrderNumber { get; set; } = string.Empty;

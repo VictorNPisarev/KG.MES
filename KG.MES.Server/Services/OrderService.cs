@@ -139,11 +139,6 @@ public partial class OrderService : IOrderService
 				Limit = limit,
 				Total = total,
 				Pages = (int)Math.Ceiling(total / (double)limit)
-			},
-			Sort = new SortInfo
-			{
-				By = sortBy ?? "ready_date",
-				Order = sortOrder ?? "asc"
 			}
 		};
 	}

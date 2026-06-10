@@ -6,7 +6,6 @@ using KG.MES.Server.Data;
 using KG.MES.Server.Models.Dto;
 using KG.MES.Server.Tests.Helpers;
 using KG.MES.Shared.Models.Dto;
-using KG.MES.Shared.Models.Entities;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;

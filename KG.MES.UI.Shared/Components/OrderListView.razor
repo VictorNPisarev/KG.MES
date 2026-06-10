@@ -1,0 +1,265 @@
+@using KG.MES.Shared.Helpers
+@typeparam TOrder
+
+<PageTitle>@Title</PageTitle>
+
+<div class="container-fluid py-4">
+	<!-- Sticky заголовок -->
+	<div class="sticky-header">
+		<div class="container-fluid">
+			<div class="row align-items-center">
+				<div class="col">
+					<h1 class="display-6 mb-1">
+						<i class="bi bi-clipboard-check"></i> @Title
+					</h1>
+				</div>
+				@if (ShowActions)
+				{
+					<div class="col-auto">
+						@HeaderActions
+					</div>
+				}
+			</div>
+		</div>
+	</div>
+
+	<!-- Фильтры -->
+	<div class="row mt-4 g-2">
+		<div class="col-md-2">
+			<select class="form-select" @bind="selectedWorkplaceId">
+				<option value="">Все участки</option>
+				@foreach (var workplace in workplaces)
+				{
+					<option value="@workplace.Id">@workplace.Name</option>
+				}
+			</select>
+		</div>
+		<div class="col-md-2">
+			<input class="form-control"
+				   type="text"
+				   placeholder="Номер заказа"
+				   @bind="searchNumber"
+				   @onkeyup="OnSearchKeyUp" />
+		</div>
+		<div class="col-md-2">
+			<select class="form-select" @bind="pageSize" @bind:after="OnPageSizeChanged">
+				<option value="20">20</option>
+				<option value="50">50</option>
+				<option value="100">100</option>
+			</select>
+		</div>
+		<div class="col-md-2">
+			<button class="btn btn-primary w-100" @onclick="ApplyFilters">
+				<i class="bi bi-search"></i> Найти
+			</button>
+		</div>
+	</div>
+
+	<!-- Панель над таблицей -->
+	<div class="d-flex justify-content-between align-items-center mt-3 mb-2">
+		<div class="text-muted">
+			@if (orders.Data.Any())
+			{
+				<span>Показано @((orders.Page - 1) * orders.Limit + 1)-@(Math.Min(orders.Page * orders.Limit, orders.Total)) из @orders.Total</span>
+			}
+		</div>
+			<div class="d-flex gap-2">
+				<!-- Колонки -->
+				<div class="position-relative">
+					<button class="btn btn-sm btn-outline-secondary"
+							@onclick="() => isColumnsOpen = !isColumnsOpen"
+							type="button">
+						<i class="bi bi-gear"></i> Колонки
+						<i class="bi @(isColumnsOpen ? "bi-chevron-up" : "bi-chevron-down") ms-1 small"></i>
+					</button>
+
+					@if (isColumnsOpen)
+					{
+						<div class="dropdown-menu dropdown-menu-end show p-3"
+							style="min-width: 300px; position: absolute; right: 0; z-index: 1000;">
+							<h6 class="dropdown-header">Настройка колонок</h6>
+							@foreach (var setting in columnSettings.OrderBy(s => s.Order))
+							{
+								var info = columnInfos.FirstOrDefault(i => i.PropertyName == setting.PropertyName);
+								var title = info?.Title ?? setting.PropertyName;
+								<div class="d-flex align-items-center py-1">
+									<div class="form-check mb-0">
+										<input type="checkbox"
+											class="form-check-input"
+											id="col-@setting.PropertyName"
+											checked="@setting.Visible"
+											@onchange="(e) => ToggleColumn(setting.PropertyName, (bool)(e.Value ?? false))" />
+										<label class="form-check-label" for="col-@setting.PropertyName">
+											@title
+										</label>
+										<button class="btn btn-sm btn-link p-0"
+												@onclick="() => MoveColumn(setting.PropertyName, -1)" disabled="@(setting.Order <= 0)">
+											<i class="bi bi-chevron-up small"></i>
+										</button>
+										<button class="btn btn-sm btn-link p-0"
+												@onclick="() => MoveColumn(setting.PropertyName, 1)">
+											<i class="bi bi-chevron-down small"></i>
+										</button>
+									</div>
+								</div>
+							}
+							<hr />
+							<button class="btn btn-sm btn-outline-primary w-100" @onclick="async () => { await ResetColumns(); isColumnsOpen = false; }">
+								<i class="bi bi-arrow-counterclockwise"></i> Сбросить
+							</button>
+						</div>
+
+						<!-- Затемнение для закрытия при клике снаружи -->
+						<div class="position-fixed top-0 start-0 w-100 h-100"
+							style="z-index: 999;"
+							@onclick="() => isColumnsOpen = false"></div>
+					}
+				</div>
+			</div>
+	</div>
+
+	<!-- Таблица -->
+	@if (isLoading)
+	{
+		<div class="text-center py-5">
+			<div class="spinner-border text-primary" role="status">
+				<span class="visually-hidden">Загрузка...</span>
+			</div>
+			<p class="text-muted mt-2">Загружаем заказы...</p>
+		</div>
+	}
+	else if (orders.Data.Any())
+	{
+		var visibleData = BuildVisibleColumns();
+
+		<div class="table-responsive mt-3">
+			<table class="table table-hover">
+				<thead class="table-light">
+					<tr>
+						@foreach (var col in visibleData)
+						{
+							<th style="@(col.Setting.Width > 0 ? $"width: {col.Setting.Width}px;" : "")">
+								@col.Info.Title
+							</th>
+						}
+						<th style="width: 40px;"></th>
+					</tr>
+				</thead>
+				<tbody>
+					@foreach (var order in orders.Data)
+					{
+						<tr>
+							@foreach (var col in visibleData)
+							{
+								<td>
+									@if(order != null)
+									{
+										@if (col.Info.IsBadge)
+										{
+											var prop = order.GetType().GetProperty(col.Info.BadgeProperty ?? col.Info.PropertyName);
+											var value = prop?.GetValue(order);
+
+											<span class="badge @BadgeHelper.GetBadgeClass(value?.ToString())">
+												@BadgeHelper.GetFormattedBadgeValue(order, col.Info)
+											</span>
+										}
+										else
+										{
+											@ColumnHelper.GetFormattedValue(order, col.Info)
+										}
+										
+										@if (!string.IsNullOrEmpty(col.Info.CommentField))
+										{
+											var comment = order.GetType().GetProperty(col.Info.CommentField)?.GetValue(order)?.ToString();
+											if (!string.IsNullOrEmpty(comment))
+											{
+												<i class="bi bi-chat-left-text text-primary ms-1 small" 
+												title="@comment" 
+												style="cursor: help;"></i>
+											}
+										}
+									}
+								</td>
+							}
+							<td>
+								<button class="btn btn-sm btn-outline-primary"
+										@onclick="() => OpenOrder(order)">
+									<i class="bi bi-eye"></i>
+								</button>
+							</td>
+						</tr>
+					}
+				</tbody>
+			</table>
+		</div>
+
+		<!-- Пагинация -->
+		<div class="d-flex justify-content-between align-items-center mt-3">
+			<nav>
+				<ul class="pagination mb-0">
+					<li class="page-item @(orders.HasPreviousPage ? "" : "disabled")">
+						<button class="page-link" @onclick="() => GoToPage(1)"
+								disabled="@(!orders.HasPreviousPage)">
+							<i class="bi bi-chevron-double-left"></i>
+						</button>
+					</li>
+					<li class="page-item @(orders.HasPreviousPage ? "" : "disabled")">
+						<button class="page-link" @onclick="() => GoToPage(orders.Page - 1)"
+								disabled="@(!orders.HasPreviousPage)">
+							<i class="bi bi-chevron-left"></i>
+						</button>
+					</li>
+
+					@foreach (var pageNum in GetPageNumbers())
+					{
+						<li class="page-item @(pageNum == orders.Page ? "active" : "")">
+							<button class="page-link" @onclick="() => GoToPage(pageNum)">@pageNum</button>
+						</li>
+					}
+
+					<li class="page-item @(orders.HasNextPage ? "" : "disabled")">
+						<button class="page-link" @onclick="() => GoToPage(orders.Page + 1)"
+								disabled="@(!orders.HasNextPage)">
+							<i class="bi bi-chevron-right"></i>
+						</button>
+					</li>
+					<li class="page-item @(orders.HasNextPage ? "" : "disabled")">
+						<button class="page-link" @onclick="() => GoToPage(orders.TotalPages)"
+								disabled="@(!orders.HasNextPage)">
+							<i class="bi bi-chevron-double-right"></i>
+						</button>
+					</li>
+				</ul>
+			</nav>
+		</div>
+	}
+	else
+	{
+		<div class="text-center py-5">
+			<i class="bi bi-inbox display-1 text-muted"></i>
+			<p class="text-muted mt-3">Нет заказов</p>
+		</div>
+	}
+</div>
+<!-- Модальное окно с карточкой заказа -->
+@if (isModalOpen)
+{
+	<div class="modal fade show" style="display: block;" tabindex="-1">
+		<div class="modal-dialog modal-xl">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title">Заказ №@GetOrderNumber(selectedOrder!)</h5>
+					<button type="button" class="btn-close" @onclick="() => dashboardRef!.CloseOrder()"></button>
+				</div>
+				<div class="modal-body">
+					<OrderDashboard @ref="dashboardRef"
+									TOrder="TOrder" 
+									OrderId="@GetOrderId(selectedOrder!)" 
+									Settings="@Settings"
+									OnClose="CloseOrder" />
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="modal-backdrop fade show" @onclick="() => dashboardRef!.CloseOrder()"></div>
+}

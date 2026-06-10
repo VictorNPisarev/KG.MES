@@ -124,10 +124,6 @@ public class OrdersControllerTests : IClassFixture<WebApplicationFactory<Program
 		result.Pagination.Limit.Should().Be(50);
 		result.Pagination.Total.Should().Be(3); // Всего в БД 3 заказа
 		result.Pagination.Pages.Should().Be(1);
-
-		// Проверяем, что сортировка вернулась в ответе
-		result.Sort.By.Should().Be("ready_date");
-		result.Sort.Order.Should().Be("asc");
 	}
 
 	[Fact]

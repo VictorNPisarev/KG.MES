@@ -27,10 +27,7 @@ public class SupplyService : ISupplyService
 			.Select(st => new SupplyTypeDto
 			{
 				Id = st.Id,
-				Name = st.Name,
-				DisplayName = st.DisplayName,
-				Unit = st.Unit,
-				IsActive = st.IsActive
+				Name = st.Name
 			})
 			.ToListAsync();
 	}

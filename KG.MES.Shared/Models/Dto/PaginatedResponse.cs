@@ -1,29 +1,20 @@
+using System.Text.Json.Serialization;
+
 namespace KG.MES.Shared.Models.Dto;
 
 public class PaginatedResponse<T>
 {
-	public List<T> Data { get; set; } = new();
+	[JsonPropertyName("data")]
+	public List<T> Data { get; set; } = [];
+
+	[JsonPropertyName("pagination")]
 	public PaginationInfo Pagination { get; set; } = new();
-	public SortInfo Sort { get; set; } = new();
-	public FilterInfo Filters { get; set; } = new();
-}
 
-public class PaginationInfo
-{
-	public int Page { get; set; }
-	public int Limit { get; set; }
-	public int Total { get; set; }
-	public int Pages { get; set; }
-}
-
-public class SortInfo
-{
-	public string By { get; set; } = string.Empty;
-	public string Order { get; set; } = string.Empty;
-}
-
-public class FilterInfo
-{
-	public Guid? WorkplaceId { get; set; }
-	public string? OrderNumber { get; set; }
+	// Удобные свойства для UI
+	public int Page => Pagination.Page;
+	public int Limit => Pagination.Limit;
+	public int Total => Pagination.Total;
+	public int TotalPages => Pagination.Pages;
+	public bool HasNextPage => Page < TotalPages;
+	public bool HasPreviousPage => Page > 1;
 }

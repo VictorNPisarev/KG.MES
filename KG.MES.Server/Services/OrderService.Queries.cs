@@ -67,7 +67,7 @@ public partial class OrderService
 					OrderId = order.Id,
 					OrderNumber = order.OrderNumber,
 					ReadyDate = order.ReadyDate,
-					Workplaces = new List<WorkplaceTraceDto>()
+					WorkplaceTraces = new List<WorkplaceTraceDto>()
 				});
 				continue;
 			}
@@ -90,7 +90,7 @@ public partial class OrderService
 				ProductionOrderId = productionOrder.Id,
 				OrderNumber = order.OrderNumber,
 				ReadyDate = order.ReadyDate,
-				Workplaces = footprints
+				WorkplaceTraces = footprints
 			});
 		}
 

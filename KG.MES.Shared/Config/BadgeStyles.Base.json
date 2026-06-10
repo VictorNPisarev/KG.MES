@@ -1,0 +1,75 @@
+{
+	"groups":
+	{
+		"workplaces":
+		{
+			"none": "bg-secondary",
+			"торцовка": "bg-primary bg-opacity-25 text-primary",
+			"столярка": "bg-primary bg-opacity-25 text-primary",
+			"профилирование": "bg-primary bg-opacity-25 text-primary",
+			"сборка": "bg-primary bg-opacity-25 text-primary",
+			"шлифовка": "bg-primary bg-opacity-25 text-primary",
+			"покраска": "bg-primary bg-opacity-25 text-primary",
+			"фурнитура": "bg-primary bg-opacity-25 text-primary",
+			"остекление": "bg-primary bg-opacity-25 text-primary",
+			"упаковка": "bg-primary bg-opacity-25 text-primary",
+			"готово": "bg-success bg-opacity-25 text-success",
+			"отгружен": "bg-success"
+		},
+		"workplace_statuses":
+		{
+			"planned": "badge-ghost-dark",
+			"pending": "bg-warning bg-opacity-25 text-warning",
+			"active": "bg-primary bg-opacity-25 text-primary",
+			"completed": "bg-success bg-opacity-25 text-success",
+			"joinery": "bg-warning bg-opacity-25 text-warning"
+		},
+		"workplace_logs":
+		{
+			"COMPLETE": "bg-success bg-opacity-25 text-success",
+			"START": "bg-primary bg-opacity-25 text-primary"
+		},
+		"supply_statuses":
+		{
+			"not_available": "bg-danger bg-opacity-25 text-danger",
+			"delayed": "bg-warning bg-opacity-25 text-warning",
+			"ordered": "bg-primary bg-opacity-25 text-primary",
+			"in_stock": "bg-success bg-opacity-25 text-success"
+		},
+		"booleans":
+		{
+			"True": "bg-success",
+			"False": "bg-light text-dark"
+		}
+	},
+	"defaults":
+	{
+		"defaultStatus": "bg-light text-dark",
+		"defaultBoolean": "bg-light text-dark"
+	},
+	"displays":
+	{
+		"workplace_name":
+		{
+			"none": "Ожидает",
+			"торцовка": "В работе",
+			"столярка": "В работе",
+			"профилирование": "В работе",
+			"сборка": "В работе",
+			"шлифовка": "В работе",
+			"покраска": "В работе",
+			"фурнитура": "В работе",
+			"остекление": "В работе",
+			"упаковка": "В работе",
+			"готово": "Готово",
+			"отгружен": "Отгружен"
+		},
+		"supply_status":
+		{
+			"not_available": "Нет в наличии",
+			"delayed": "Задерживается",
+			"ordered": "Заказан",
+			"in_stock": "На складе"
+		}
+	}
+}

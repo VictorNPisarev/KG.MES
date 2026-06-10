@@ -9,13 +9,18 @@ public class SupplyTypeDto
 
 	[JsonPropertyName("name")]
 	public string Name { get; set; } = string.Empty;
-
-	[JsonPropertyName("display_name")]
-	public string? DisplayName { get; set; }
-
-	[JsonPropertyName("unit")]
-	public string? Unit { get; set; }
-
-	[JsonPropertyName("is_active")]
-	public bool IsActive { get; set; }
 }
+
+public static class SupplyTypeDtoExtensions
+{
+	public static string DisplayName(this SupplyTypeDto supplyType) => supplyType.Name switch
+	{
+		"lumber" => "Брус",
+		"furniture" => "Фурнитура",
+		"glass" => "Стекло",
+		"paint" => "ЛКМ",
+		"alumWaterShield" => "ППС, В/О",
+		_ => supplyType.Name
+	};
+}
+
