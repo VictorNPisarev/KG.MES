@@ -13,5 +13,4 @@
     <PackageReference Include="Microsoft.JSInterop" Version="9.0.0" />
   </ItemGroup>
 
-
 </Project>

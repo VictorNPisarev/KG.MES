@@ -3,6 +3,8 @@ using KG.MES.Shared.Helpers;
 using KG.MES.Shared.Models.Dto;
 using KG.MES.Shared.Services;
 
+namespace KG.MES.Shared.ViewModels;
+
 public class OrderSupplyViewModel
 {
 	private readonly SupplyService _supplyService;

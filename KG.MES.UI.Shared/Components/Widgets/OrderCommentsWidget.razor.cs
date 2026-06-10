@@ -16,8 +16,8 @@ public partial class OrderCommentsWidget : ComponentBase, ISavableWidget, IDispo
 	[Inject] IJSRuntime JSRuntime { get; set; } = null!;
 	[Inject] private IEventAggregator EventAggregator { get; set; } = null!;
 
-	private List<OrderCommentViewModel> comments = new();
-	private List<OrderCommentViewModel> originalComments = new();
+	private List<OrderCommentViewModel> comments = [];
+	private List<OrderCommentViewModel> originalComments = [];
 	private bool isLoading = true;
 
 	protected override async Task OnInitializedAsync()
