@@ -103,6 +103,7 @@ public class SupplyControllerTests : IClassFixture<WebApplicationFactory<Program
 			.WithSupplyItem(si => { si.OrderSupplyId = orderSupplyId; si.SupplyTypeId = paintTypeId; si.ConditionId = null; })
 			.Build(customFactory.Services);
 
+		// Формируем запрос ТОЧНО так, как это делает клиент (обёртка с полем "supplies")
 		var clientRequest = new
 		{
 			supplies = new List<object>
@@ -125,13 +126,33 @@ public class SupplyControllerTests : IClassFixture<WebApplicationFactory<Program
 		result!.Success.Should().BeTrue();
 		result.Message.Should().Be("2 supply items updated");
 
+		// Проверяем, что данные действительно обновились в БД
 		using var scope = customFactory.Services.CreateScope();
 		var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
+		// Проверяем lumber item
 		var lumberItem = await db.SupplyItems.FirstOrDefaultAsync(si => si.SupplyTypeId == lumberTypeId);
 		lumberItem.Should().NotBeNull();
 		lumberItem!.ConditionId.Should().Be(pendingConditionId);
-		lumberItem.Comment.Should().Be("Древесина заказана");
+
+		// Проверяем, что комментарий создался
+		lumberItem.CommentId.Should().NotBeNull("Comment should be created for lumber item");
+		var lumberComment = await db.Comments.FirstOrDefaultAsync(c => c.Id == lumberItem.CommentId!.Value);
+		lumberComment.Should().NotBeNull();
+		lumberComment!.Content.Should().Be("Древесина заказана");
+		lumberComment.OrderId.Should().Be(orderId);
+
+		// Проверяем paint item
+		var paintItem = await db.SupplyItems.FirstOrDefaultAsync(si => si.SupplyTypeId == paintTypeId);
+		paintItem.Should().NotBeNull();
+		paintItem!.ConditionId.Should().Be(pendingConditionId);
+
+		// Проверяем, что комментарий создался
+		paintItem.CommentId.Should().NotBeNull("Comment should be created for paint item");
+		var paintComment = await db.Comments.FirstOrDefaultAsync(c => c.Id == paintItem.CommentId!.Value);
+		paintComment.Should().NotBeNull();
+		paintComment!.Content.Should().Be("Краска заказана");
+		paintComment.OrderId.Should().Be(orderId);
 	}
 
 	[Fact]
