@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <OverrideHtmlAssetPlaceholders>true</OverrideHtmlAssetPlaceholders>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="10.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="10.0.0" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="10.0.0" />
+  </ItemGroup>
+
+    <ItemGroup>
+    <ProjectReference Include="..\KG.MES.Shared\KG.MES.Shared.csproj" />
+    <ProjectReference Include="..\KG.MES.UI.Shared\KG.MES.UI.Shared.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\KG.MES.Shared\Config\BadgeStyles.Base.json" Link="Config\BadgeStyles.Base.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+</Project>

@@ -1,0 +1,13 @@
+{
+	"extends": "base",
+	"groups": {
+		"workplaces":
+		{
+			"торцовка": "bg-warning bg-opacity-25 text-warning",
+			"столярка": "bg-warning bg-opacity-25 text-warning",
+			"профилирование": "bg-primary bg-opacity-25 text-primary",
+			"сборка": "bg-primary bg-opacity-25 text-primary",
+			"покраска": "bg-info bg-opacity-25 text-info"
+		}
+	}
+}
