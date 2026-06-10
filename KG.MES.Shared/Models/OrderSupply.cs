@@ -3,7 +3,7 @@ using KG.MES.Shared.Helpers;
 using KG.MES.Shared.Models.Dto;
 using KG.MES.Shared.Services;
 
-public class OrderSupply
+public class OrderSupplyViewModel
 {
 	private readonly SupplyService _supplyService;
 
@@ -14,11 +14,11 @@ public class OrderSupply
 	public Guid? CommentId { get; set; }
 
 	// Справочные данные (заполняются извне)
-	public SupplyType? SupplyType { get; private set; }
-	public SupplyCondition? SupplyCondition { get; private set; }
+	public SupplyTypeDto? SupplyType { get; private set; }
+	public SupplyConditionDto? SupplyCondition { get; private set; }
 	//[JsonIgnore] public string? ConditionBadge { get; private set; }
 
-	public OrderSupply(OrderSupplyDto dto, SupplyService supplyService)
+	public OrderSupplyViewModel(OrderSupplyDto dto, SupplyService supplyService)
 	{
 		_supplyService = supplyService;
 		SupplyTypeId = dto.SupplyTypeId;

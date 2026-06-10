@@ -24,7 +24,7 @@ builder.Services.AddRazorComponents().AddInteractiveServerComponents();
 builder.Services.AddHttpClient<ProductionApiService>();
 builder.Services.AddSingleton(LoadViewSettings());
 builder.Services.AddSingleton<SupplyService>();
-builder.Services.AddSingleton<IEventAggregator, EventAggregator>();
+builder.Services.AddScoped<IEventAggregator, EventAggregator>();
 builder.Services.AddScoped<ISocketService, SocketService>();
 
 

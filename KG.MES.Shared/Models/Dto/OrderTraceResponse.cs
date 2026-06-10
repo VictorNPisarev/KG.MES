@@ -8,11 +8,11 @@ namespace KG.MES.Shared.Models.Dto
 	public class OrderTraceResponse
 	{
 		[JsonPropertyName("orders")]
-		public List<OrderTrace> OrderTraces { get; set; } = new();
+		public List<OrderTraceDto> OrderTraces { get; set; } = new();
 	}
 
 
-	public class OrderTrace
+	public class OrderTraceDto
 	{
 		[JsonPropertyName("orderId")]
 		public Guid OrderId { get; set; }
@@ -27,6 +27,6 @@ namespace KG.MES.Shared.Models.Dto
 		public DateTime? ReadyDate { get; set; }
 
 		[JsonPropertyName("workplaces")]
-		public List<WorkplaceTrace> WorkplaceTraces { get; set; } = new();
+		public List<WorkplaceTraceDto> WorkplaceTraces { get; set; } = new();
 	}
 }

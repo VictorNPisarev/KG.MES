@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace KG.MES.Shared.Models.Dto
 {
-	public class WorkplaceTrace
+	public class WorkplaceTraceDto
 	{
 		[JsonPropertyName("workplaceId")]
 		public Guid WorkplaceId { get; set; }
@@ -16,7 +16,7 @@ namespace KG.MES.Shared.Models.Dto
 
 	public static class WorkplaceTraceExtensions
 	{
-		public static string GetStatusText(this WorkplaceTrace trace) => trace.Status.ToLower() switch
+		public static string GetStatusText(this WorkplaceTraceDto trace) => trace.Status.ToLower() switch
 		{
 			"planned" => "Не определен",
 			"pending" => "Ожидает",

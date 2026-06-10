@@ -16,8 +16,8 @@ public partial class OrderCommentsWidget : ComponentBase, ISavableWidget, IDispo
 	[Inject] IJSRuntime JSRuntime { get; set; } = null!;
 	[Inject] private IEventAggregator EventAggregator { get; set; } = null!;
 
-	private List<OrderCommentDto> comments = new();
-	private List<OrderCommentDto> originalComments = new();
+	private List<OrderCommentViewModel> comments = new();
+	private List<OrderCommentViewModel> originalComments = new();
 	private bool isLoading = true;
 
 	protected override async Task OnInitializedAsync()
@@ -32,7 +32,7 @@ public partial class OrderCommentsWidget : ComponentBase, ISavableWidget, IDispo
 		StateHasChanged();
 		comments = await ApiService.GetOrderCommentsAsync(OrderId);
 		// Глубокая копия для отслеживания изменений
-		originalComments = comments.Select(c => new OrderCommentDto
+		originalComments = comments.Select(c => new OrderCommentViewModel
 		{
 			Id = c.Id,
 			Content = c.Content,
@@ -46,7 +46,7 @@ public partial class OrderCommentsWidget : ComponentBase, ISavableWidget, IDispo
 
 	private void AddNewComment()
 	{
-		var newComment = new OrderCommentDto
+		var newComment = new OrderCommentViewModel
 		{
 			Id = Guid.NewGuid(), // временный ID
 			IsNew = true,
@@ -56,12 +56,12 @@ public partial class OrderCommentsWidget : ComponentBase, ISavableWidget, IDispo
 		comments.Add(newComment);
 	}
 
-	private void EditComment(OrderCommentDto comment)
+	private void EditComment(OrderCommentViewModel comment)
 	{
 		comment.IsEditing = true;
 	}
 
-	private async Task SaveComment(OrderCommentDto comment)
+	private async Task SaveComment(OrderCommentViewModel comment)
 	{
 		Console.WriteLine($"SaveComment OrderId: {OrderId}");
 		var success = await ApiService.SaveCommentAsync(OrderId, comment);//SaveSupplyCommentAsync(OrderId, comment);
@@ -76,15 +76,15 @@ public partial class OrderCommentsWidget : ComponentBase, ISavableWidget, IDispo
 			//	OrderId = OrderId,
 			//	Source = "supply"
 			//});
-			_ = Task.Run(() => EventAggregator.Publish(new OrderCommentUpdatedEvent
-			{
-				OrderId = OrderId,
-				Source = "supply"
-			}));
+			//_ = Task.Run(() => EventAggregator.Publish(new OrderCommentUpdatedEvent
+			//{
+			//	OrderId = OrderId,
+			//	Source = "supply"
+			//}));
 		}
 	}
 
-	private void CancelEditComment(OrderCommentDto comment)
+	private void CancelEditComment(OrderCommentViewModel comment)
 	{
 		if (comment.IsNew)
 		{
@@ -102,7 +102,7 @@ public partial class OrderCommentsWidget : ComponentBase, ISavableWidget, IDispo
 		}
 	}
 
-	private async Task DeleteComment(OrderCommentDto comment)
+	private async Task DeleteComment(OrderCommentViewModel comment)
 	{
 		if (comment.IsNew)
 		{

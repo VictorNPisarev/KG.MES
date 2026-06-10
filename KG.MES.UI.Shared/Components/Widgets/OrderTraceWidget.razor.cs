@@ -14,8 +14,8 @@ public partial class OrderTraceWidget : ComponentBase, ISavableWidget
 	[Inject] private ProductionApiService ApiService { get; set; } = null!;
 	[Inject] private ISocketService SocketService { get; set; } = null!;
 
-	private OrderTrace? orderTrace;
-	private OrderTrace? backupTrace;
+	private OrderTraceDto? orderTrace;
+	private OrderTraceDto? backupTrace;
 	private bool isLoading = true;
 	private bool EditMode;
 	private Dictionary<string, bool> openDropdowns = new();
@@ -47,10 +47,10 @@ public partial class OrderTraceWidget : ComponentBase, ISavableWidget
 
 	private void EnterEditMode()
 	{
-		backupTrace = new OrderTrace
+		backupTrace = new OrderTraceDto
 		{
 			OrderNumber = orderTrace?.OrderNumber ?? "",
-			WorkplaceTraces = orderTrace?.WorkplaceTraces.Select(w => new WorkplaceTrace
+			WorkplaceTraces = orderTrace?.WorkplaceTraces.Select(w => new WorkplaceTraceDto
 			{
 				WorkplaceId = w.WorkplaceId,
 				WorkplaceName = w.WorkplaceName,

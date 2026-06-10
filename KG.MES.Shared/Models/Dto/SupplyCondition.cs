@@ -3,7 +3,7 @@ using KG.MES.Shared.Helpers;
 
 namespace KG.MES.Shared.Models.Dto
 {
-	public class SupplyCondition
+	public class SupplyConditionDto
 	{
 		[JsonPropertyName("id")]
 		public string Id { get; set; } = string.Empty;
@@ -14,7 +14,7 @@ namespace KG.MES.Shared.Models.Dto
 
 	public static class SupplyConditionExtensions
 	{
-		public static string DisplayName(this SupplyCondition condition)
+		public static string DisplayName(this SupplyConditionDto condition)
 			=> BadgeHelper.GetDisplayValue(condition.ConditionCode, "supply_status");
 	}
 }

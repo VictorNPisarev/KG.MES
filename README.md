@@ -47,6 +47,22 @@ npm run dev
 ```
 API: http://192.168.0.179:3000/api
 
+## Публикация
+
+```bash
+#в папке проекта
+dotnet publish -c Release -o C:\DEVelop\KG.MES.DeployTest\portal\main
+```
+
+Файл app_offline.htm (Элегантный, без остановки пула)
+ASP.NET Core имеет встроенный механизм: если в корне сайта появляется файл app_offline.htm, IIS автоматически останавливает приложение и освобождает все DLL.
+
+### Как использовать:
+
+Перед копированием создайте в папке сайта файл app_offline.htm (любого содержания, например <h1>Обновление...</h1>).
+Скопируйте новые файлы.
+Удалите app_offline.htm — приложение автоматически перезапустится.
+
 ## ⚙️ Конфигурация
 Каждое приложение имеет свой appsettings.json и Config/orderViewSettings.json. Общие настройки стилей в Config/BadgeStyles.json.
 

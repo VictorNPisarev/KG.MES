@@ -8,8 +8,8 @@ namespace KG.MES.Shared.Services
 		private readonly ProductionApiService _api;
 		private readonly ILogger<SupplyService> _logger;
 
-		private List<SupplyType>? _cachedTypes;
-		private List<SupplyCondition>? _cachedConditions;
+		private List<SupplyTypeDto>? _cachedTypes;
+		private List<SupplyConditionDto>? _cachedConditions;
 
 		public SupplyService(ProductionApiService api, ILogger<SupplyService> logger)
 		{
@@ -17,7 +17,7 @@ namespace KG.MES.Shared.Services
 			_logger = logger;
 		}
 
-		public async Task<List<SupplyType>> GetTypesAsync()
+		public async Task<List<SupplyTypeDto>> GetTypesAsync()
 		{
 			if (_cachedTypes != null) return _cachedTypes;
 
@@ -33,7 +33,7 @@ namespace KG.MES.Shared.Services
 			}
 		}
 
-		public async Task<List<SupplyCondition>> GetConditionsAsync()
+		public async Task<List<SupplyConditionDto>> GetConditionsAsync()
 		{
 			if (_cachedConditions != null) return _cachedConditions;
 

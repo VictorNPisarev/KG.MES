@@ -38,7 +38,7 @@ builder.Services.AddSingleton<IMaterialFactory, MaterialFactory>();
 builder.Services.AddScoped<IDocumentItemFactory, DocumentItemFactory>();
 builder.Services.AddSingleton(LoadViewSettings());
 builder.Services.AddSingleton<SupplyService>();
-builder.Services.AddSingleton<IEventAggregator, EventAggregator>();
+builder.Services.AddScoped<IEventAggregator, EventAggregator>();
 builder.Services.AddScoped<ISocketService, SocketService>();
 
 var app = builder.Build();
@@ -86,7 +86,8 @@ async Task LoadDataAsync(IServiceProvider services, IWebHostEnvironment env)
 	//Загрузка конфига для выделения цветом полей-ярлыков
 	try
 	{
-		var baseConfig = Path.Combine(env.ContentRootPath, "..", "KG.MES.Shared", "Config", "BadgeStyles.Base.json");
+		//var baseConfig = Path.Combine(env.ContentRootPath, "..", "KG.MES.Shared", "Config", "BadgeStyles.Base.json");
+		var baseConfig = Path.Combine(env.ContentRootPath, "Config", "BadgeStyles.Base.json");
 		var appConfig = Path.Combine(env.ContentRootPath, "Config", "BadgeStyles.json");
 
 		BadgeHelper.LoadConfig(baseConfig, appConfig);

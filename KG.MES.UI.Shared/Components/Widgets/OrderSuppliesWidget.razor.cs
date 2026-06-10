@@ -18,11 +18,11 @@ public partial class OrderSuppliesWidget : ComponentBase, ISavableWidget
 	[Inject] private IEventAggregator EventAggregator { get; set; } = null!;
 	[Inject] private ISocketService SocketService { get; set; } = null!;
 
-	private List<OrderSupply> supplies = [];
-	private List<OrderSupply> originalSupplies = [];
-	private List<OrderSupply> backup = [];
-	private List<SupplyCondition> conditions = [];
-	private List<SupplyType> types = [];
+	private List<OrderSupplyViewModel> supplies = [];
+	private List<OrderSupplyViewModel> originalSupplies = [];
+	private List<OrderSupplyViewModel> backup = [];
+	private List<SupplyConditionDto> conditions = [];
+	private List<SupplyTypeDto> types = [];
 
 	private bool isLoading = true;
 	private bool EditMode;
@@ -49,21 +49,21 @@ public partial class OrderSuppliesWidget : ComponentBase, ISavableWidget
 	private async Task LoadSupplies()
 	{
 		var supplyDtos = await ApiService.GetOrderSuppliesAsync(OrderId);
-		originalSupplies = supplyDtos.Select(s => new OrderSupply(s, SupplyService)).ToList();
-		supplies = supplyDtos.Select(s => new OrderSupply(s, SupplyService)).ToList();
+		originalSupplies = supplyDtos.Select(s => new OrderSupplyViewModel(s, SupplyService)).ToList();
+		supplies = supplyDtos.Select(s => new OrderSupplyViewModel(s, SupplyService)).ToList();
 
 		StateHasChanged();
 	}
 
 	private void EnterEditMode()
 	{
-		backup = supplies.Select(s => new OrderSupply(s.ToDto(), SupplyService)).ToList();
+		backup = supplies.Select(s => new OrderSupplyViewModel(s.ToDto(), SupplyService)).ToList();
 		EditMode = true;
 	}
 
 	private void CancelEdit()
 	{
-		supplies = backup.Select(b => new OrderSupply(b.ToDto(), SupplyService)).ToList();
+		supplies = backup.Select(b => new OrderSupplyViewModel(b.ToDto(), SupplyService)).ToList();
 		backup.Clear();
 		EditMode = false;
 		showComments.Clear();
@@ -71,7 +71,7 @@ public partial class OrderSuppliesWidget : ComponentBase, ISavableWidget
 		openDropdowns.Clear();
 	}
 
-	private void SelectCondition(OrderSupply supply, string conditionId)
+	private void SelectCondition(OrderSupplyViewModel supply, string conditionId)
 	{
 		supply.SetCondition(conditionId);
 	}
@@ -89,7 +89,7 @@ public partial class OrderSuppliesWidget : ComponentBase, ISavableWidget
 		openDropdowns.Remove(key);
 	}
 
-	private void ToggleComment(OrderSupply supply)
+	private void ToggleComment(OrderSupplyViewModel supply)
 	{
 		var key = supply.SupplyTypeId;
 		if (showComments.GetValueOrDefault(key))
@@ -163,8 +163,8 @@ public partial class OrderSuppliesWidget : ComponentBase, ISavableWidget
 		{
 			ClearState();
 			var supplyDtos = await ApiService.GetOrderSuppliesAsync(OrderId);
-			originalSupplies = supplyDtos.Select(s => new OrderSupply(s, SupplyService)).ToList(); 
-			supplies = supplyDtos.Select(s => new OrderSupply(s, SupplyService)).ToList();
+			originalSupplies = supplyDtos.Select(s => new OrderSupplyViewModel(s, SupplyService)).ToList(); 
+			supplies = supplyDtos.Select(s => new OrderSupplyViewModel(s, SupplyService)).ToList();
 
 
 			// Публикую событие
@@ -173,11 +173,11 @@ public partial class OrderSuppliesWidget : ComponentBase, ISavableWidget
 			//	OrderId = OrderId,
 			//	Source = "supply"
 			//});
-			_ = Task.Run(() => EventAggregator.Publish(new OrderCommentUpdatedEvent
-			{
-				OrderId = OrderId,
-				Source = "supply"
-			}));
+			//_ = Task.Run(() => EventAggregator.Publish(new OrderCommentUpdatedEvent
+			//{
+			//	OrderId = OrderId,
+			//	Source = "supply"
+			//}));
 		}
 		else
 		{
@@ -185,7 +185,7 @@ public partial class OrderSuppliesWidget : ComponentBase, ISavableWidget
 		}
 	}
 
-	private async Task SaveComment(OrderSupply supply)
+	private async Task SaveComment(OrderSupplyViewModel supply)
 	{
 		var original = originalSupplies.FirstOrDefault(o => o.SupplyTypeId == supply.SupplyTypeId);
 		var success = false;
@@ -209,7 +209,7 @@ public partial class OrderSuppliesWidget : ComponentBase, ISavableWidget
 		{
 			Console.WriteLine("supply.Comment != original?.Comment && supply.CommentId != null");
 			success = await ApiService.UpdateCommentAsync(OrderId,
-			new OrderCommentDto
+			new OrderCommentViewModel
 			{
 				Id = supply.CommentId ?? new Guid(),
 				Content = supply.Comment
@@ -230,11 +230,11 @@ public partial class OrderSuppliesWidget : ComponentBase, ISavableWidget
 			//	OrderId = OrderId,
 			//	Source = "supply"
 			//});
-			_ = Task.Run(() => EventAggregator.Publish(new OrderCommentUpdatedEvent
-			{
-				OrderId = OrderId,
-				Source = "supply"
-			}));
+			//_ = Task.Run(() => EventAggregator.Publish(new OrderCommentUpdatedEvent
+			//{
+			//	OrderId = OrderId,
+			//	Source = "supply"
+			//}));
 		}
 
 		showComments.Remove(supply.SupplyTypeId);

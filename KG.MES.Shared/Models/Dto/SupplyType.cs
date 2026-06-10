@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace KG.MES.Shared.Models.Dto
 {
-	public class SupplyType
+	public class SupplyTypeDto
 	{
 		[JsonPropertyName("id")]
 		public string Id { get; set; } = string.Empty;
@@ -13,7 +13,7 @@ namespace KG.MES.Shared.Models.Dto
 
 	public static class SupplyTypeExtensions
 	{
-		public static string DisplayName(this SupplyType supplyType) => supplyType.Name switch
+		public static string DisplayName(this SupplyTypeDto supplyType) => supplyType.Name switch
 		{
 			"lumber" => "Брус",
 			"furniture" => "Фурнитура",

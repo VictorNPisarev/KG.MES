@@ -372,7 +372,7 @@ namespace KG.MES.Shared.Services
 		/// </summary>
 		/// <param name="orderId"></param>
 		/// <returns></returns>
-		public async Task<OrderTrace?> GetOrderTraceAsync(Guid orderId)
+		public async Task<OrderTraceDto?> GetOrderTraceAsync(Guid orderId)
 		{
 			try
 			{
@@ -427,12 +427,12 @@ namespace KG.MES.Shared.Services
 			}
 		}
 
-		public async Task<List<SupplyCondition>> GetSupplyConditionsAsync()
+		public async Task<List<SupplyConditionDto>> GetSupplyConditionsAsync()
 		{
 			try
 			{
 				var url = $"{BaseUrl}/supplies/conditions";
-				return await _httpClient.GetFromJsonAsync<List<SupplyCondition>>(url)
+				return await _httpClient.GetFromJsonAsync<List<SupplyConditionDto>>(url)
 					   ?? [];
 			}
 			catch (Exception ex)
@@ -442,12 +442,12 @@ namespace KG.MES.Shared.Services
 			}
 		}
 
-		public async Task<List<SupplyType>> GetSupplyTypesAsync()
+		public async Task<List<SupplyTypeDto>> GetSupplyTypesAsync()
 		{
 			try
 			{
 				var url = $"{BaseUrl}/supplies/types";
-				return await _httpClient.GetFromJsonAsync<List<SupplyType>>(url)
+				return await _httpClient.GetFromJsonAsync<List<SupplyTypeDto>>(url)
 					   ?? [];
 			}
 			catch (Exception ex)
@@ -457,22 +457,22 @@ namespace KG.MES.Shared.Services
 			}
 		}
 
-		public async Task<List<OrderCommentDto>> GetOrderCommentsAsync(Guid orderId)
+		public async Task<List<OrderCommentViewModel>> GetOrderCommentsAsync(Guid orderId)
 		{
 			try
 			{
 				var url = $"{BaseUrl}/orders/{orderId}/comments";
-				return await _httpClient.GetFromJsonAsync<List<OrderCommentDto>>(url)
-					   ?? new List<OrderCommentDto>();
+				return await _httpClient.GetFromJsonAsync<List<OrderCommentViewModel>>(url)
+					   ?? new List<OrderCommentViewModel>();
 			}
 			catch (Exception ex)
 			{
 				_logger.LogError(ex, "Error fetching comments for order {Id}", orderId);
-				return new List<OrderCommentDto>();
+				return new List<OrderCommentViewModel>();
 			}
 		}
 
-		public async Task<bool> SaveSupplyCommentAsync(Guid orderId, OrderCommentDto comment)
+		public async Task<bool> SaveSupplyCommentAsync(Guid orderId, OrderCommentViewModel comment)
 		{
 			try
 			{
@@ -500,7 +500,7 @@ namespace KG.MES.Shared.Services
 			}
 		}
 
-		public async Task<bool> SaveProductionOrderCommentAsync(Guid orderId, OrderCommentDto comment)
+		public async Task<bool> SaveProductionOrderCommentAsync(Guid orderId, OrderCommentViewModel comment)
 		{
 			try
 			{
@@ -528,7 +528,7 @@ namespace KG.MES.Shared.Services
 			}
 		}
 
-		public async Task<bool> SaveCommentAsync(Guid orderId, OrderCommentDto comment)
+		public async Task<bool> SaveCommentAsync(Guid orderId, OrderCommentViewModel comment)
 		{
 			try
 			{
@@ -556,7 +556,7 @@ namespace KG.MES.Shared.Services
 			}
 		}
 
-		public async Task<bool> UpdateCommentAsync(Guid orderId, OrderCommentDto comment)
+		public async Task<bool> UpdateCommentAsync(Guid orderId, OrderCommentViewModel comment)
 		{
 			try
 			{
